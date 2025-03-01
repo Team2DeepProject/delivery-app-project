@@ -20,23 +20,34 @@ public class BookmarkService {
 
     @Transactional
     public boolean toggleUserBookmark(Long storeId, Long userId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("해당 가게를 찾을 수 없습니다."));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+        // 사용자 체크
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("해당 사용자를 찾을수 없습니다.");
+        }
+        // 가게 체크
+        if (!storeRepository.existsById(storeId)) {
+            throw new RuntimeException("해당 가게를 찾을수 없습니다.");
+        }
 
         boolean exists = bookmarkRepository.existsByUserIdAndStoreId(userId, storeId);
 
         if (exists) {
             bookmarkRepository.deleteByUserIdAndStoreId(userId, storeId);
-            return false;
+            return false; // 북마크 삭제
         } else {
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new RuntimeException("사용자를 찾을수 없습니다.")
+            );
+            Store store = storeRepository.findById(storeId).orElseThrow(
+                    () -> new RuntimeException("가게를 찾을수 없습니다.")
+            );
+
             Bookmark bookmark = Bookmark.builder()
                     .user(user)
                     .store(store)
                     .build();
             bookmarkRepository.save(bookmark);
-            return true;
+            return true; // 북마크 추가
         }
     }
 
