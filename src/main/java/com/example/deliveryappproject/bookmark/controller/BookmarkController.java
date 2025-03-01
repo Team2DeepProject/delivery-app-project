@@ -16,16 +16,11 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     @PostMapping("/{storeId}")
-    public ResponseEntity<Void> toggleUserBookmark(@PathVariable Long storeId,
+    public ResponseEntity<String> toggleUserBookmark(@PathVariable Long storeId,
                                                    @SessionAttribute(name = "userId") Long userId
     ) {
         boolean isBookmarked = bookmarkService.toggleUserBookmark(storeId, userId);
-
-        if (isBookmarked) {
-            return ResponseEntity.status(201).build(); // 즐겨찾기 시 201 반환
-        } else {
-            return ResponseEntity.noContent().build(); // 즐겨찾기 취소 시 204 반환
-        }
+        return ResponseEntity.ok(isBookmarked ? "즐겨찾기 추가 완료" : "즐겨찾기 삭제 완료");
     }
 
     @GetMapping

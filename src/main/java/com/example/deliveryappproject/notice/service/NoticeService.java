@@ -32,6 +32,9 @@ public class NoticeService {
 
     @Transactional(readOnly = true)
     public List<NoticeResponseDto> getStoreNotices(Long storeid) {
+        if (!storeRepository.existsById(storeid)) {
+            throw new RuntimeException("가게를 찾을수 없습니다.");
+        }
         return noticeRepository.findByStoreIdOrderByCreatedAtDesc(storeid).stream()
                 .map(notice -> new NoticeResponseDto(notice.getId(), notice.getTitle(), notice.getContents()))
                 .collect(Collectors.toList());
