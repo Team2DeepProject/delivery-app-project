@@ -1,12 +1,11 @@
-package com.example.deliveryappproject.user.controller;
+package com.example.deliveryappproject.web.user.controller;
 
-import com.example.deliveryappproject.user.dto.UserSignupRequestDto;
-import com.example.deliveryappproject.user.dto.UserSignupResponseDto;
-import com.example.deliveryappproject.user.service.UserService;
+import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequestDto;
+import com.example.deliveryappproject.domain.user.dto.response.UserSignupResponseDto;
+import com.example.deliveryappproject.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

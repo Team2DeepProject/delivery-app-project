@@ -31,8 +31,8 @@ public class JwtFilter implements Filter {
 
         String url = httpRequest.getRequestURI();
 
-        // 회원가입 + (로그인, 로그아웃, 토큰 재발급)은 비로그인도 접근 가능
-        if (url.startsWith("/auths") || url.equals("/users/signup")) {
+        // 회원가입 + (로그인, 토큰 재발급)은 비로그인도 접근 가능
+        if (url.equals("/auths/login") || url.equals("/auths/refresh")|| url.equals("/users/signup")) {
             chain.doFilter(request, response);
             return;
         }

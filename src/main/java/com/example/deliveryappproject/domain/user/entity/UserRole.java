@@ -1,6 +1,6 @@
-package com.example.deliveryappproject.user.entity;
+package com.example.deliveryappproject.domain.user.entity;
 
-import com.example.deliveryappproject.user.Exception.InvalidRequestException;
+import com.example.deliveryappproject.common.exception.BadRequestException;
 
 import java.util.Arrays;
 
@@ -14,6 +14,6 @@ public enum UserRole {
         return Arrays.stream(UserRole.values())
                 .filter(r -> r.name().equalsIgnoreCase(role))
                 .findFirst()
-                .orElseThrow(() -> new InvalidRequestException("유효하지 않은 UerRole"));
+                .orElseThrow(() -> new BadRequestException("유효하지 않은 UerRole"));
     }
 }

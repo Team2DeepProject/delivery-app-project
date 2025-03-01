@@ -1,5 +1,6 @@
-package com.example.deliveryappproject.user.entity;
+package com.example.deliveryappproject.domain.user.entity;
 
+import com.example.deliveryappproject.common.entity.Timestamped;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,15 +8,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name="Users")
-public class User {
+@Table(name="users")    // 수정
+public class User extends Timestamped { // Timestamped 추가
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;        // userId-> id로 수정
+
+    @Column(unique = true)      // 이메일 유니크화
     private String email;
     private String password;
     private String userName;
+
+    @Enumerated(EnumType.STRING) // 추가
     private UserRole userRole;
     private int point;
 

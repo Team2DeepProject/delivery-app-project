@@ -1,5 +1,6 @@
 package com.example.deliveryappproject.common.dto;
 
+import com.example.deliveryappproject.domain.user.entity.UserRole;
 import lombok.Getter;
 
 @Getter
