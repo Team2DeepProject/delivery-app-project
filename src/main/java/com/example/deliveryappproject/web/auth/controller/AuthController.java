@@ -1,5 +1,7 @@
 package com.example.deliveryappproject.web.auth.controller;
 
+import com.example.deliveryappproject.common.annotation.Auth;
+import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.domain.auth.dto.request.AuthLoginRequest;
 import com.example.deliveryappproject.domain.auth.dto.request.AuthRefreshTokenRequest;
 import com.example.deliveryappproject.domain.auth.dto.response.AuthTokenResponse;

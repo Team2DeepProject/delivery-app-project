@@ -1,5 +1,6 @@
 package com.example.deliveryappproject.domain.auth.service;
 
+import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
 import com.example.deliveryappproject.domain.auth.dto.request.AuthLoginRequest;
