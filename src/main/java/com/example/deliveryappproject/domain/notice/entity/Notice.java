@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.notice.entity;
+package com.example.deliveryappproject.domain.notice.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +15,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EntityListeners(AutoCloseable.class)
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "notices")
 public class Notice {
 
@@ -26,7 +27,10 @@ public class Notice {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
+
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String contents;
 
     @CreatedDate

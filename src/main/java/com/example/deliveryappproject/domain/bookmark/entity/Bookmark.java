@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.bookmark.entity;
+package com.example.deliveryappproject.domain.bookmark.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
