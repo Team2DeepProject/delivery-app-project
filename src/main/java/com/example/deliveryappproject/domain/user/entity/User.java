@@ -24,6 +24,10 @@ public class User extends Timestamped { // Timestamped 추가
     private UserRole userRole;
     private int point;
 
+    public User(Long id) {
+        this.id = id;
+    }
+
     public User(String email, String password, String userName, UserRole userRole){
         this.email=email;
         this.password=password;
