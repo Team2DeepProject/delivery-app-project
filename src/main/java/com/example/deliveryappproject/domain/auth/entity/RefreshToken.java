@@ -28,13 +28,10 @@ public class RefreshToken extends Timestamped {
     @Enumerated(STRING)
     private TokenStatus tokenStatus;
 
-    private LocalDateTime expiresAt;
-
     public RefreshToken(Long userId) {
         this.userId = userId;
         this.token = UUID.randomUUID().toString();
         this.tokenStatus = TokenStatus.VALID;
-        this.expiresAt = LocalDateTime.now().plusDays(7);
     }
 
     public void updateTokenStatus(TokenStatus tokenStatus){

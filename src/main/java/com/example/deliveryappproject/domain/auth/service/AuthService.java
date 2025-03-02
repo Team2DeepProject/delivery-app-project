@@ -1,11 +1,9 @@
 package com.example.deliveryappproject.domain.auth.service;
 
 import com.example.deliveryappproject.common.dto.AuthUser;
-import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
 import com.example.deliveryappproject.config.PasswordEncoder;
 import com.example.deliveryappproject.domain.auth.dto.request.AuthLoginRequest;
-import com.example.deliveryappproject.domain.auth.dto.request.AuthRefreshTokenRequest;
 import com.example.deliveryappproject.domain.auth.dto.response.AuthTokenResponse;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.service.UserService;
@@ -41,8 +39,8 @@ public class AuthService {
 
     /* Access Token, Refresh Token 재발급 */
     @Transactional
-    public AuthTokenResponse reissueAccessToken(AuthRefreshTokenRequest request) {
-        User user = tokenService.reissueToken(request);
+    public AuthTokenResponse reissueAccessToken(String refreshToken) {
+        User user = tokenService.reissueToken(refreshToken);
 
         return getTokenResponse(user);
     }

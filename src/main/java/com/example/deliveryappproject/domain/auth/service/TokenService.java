@@ -2,19 +2,19 @@ package com.example.deliveryappproject.domain.auth.service;
 
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
 import com.example.deliveryappproject.config.JwtUtil;
-import com.example.deliveryappproject.domain.auth.dto.request.AuthLoginRequest;
-import com.example.deliveryappproject.domain.auth.dto.request.AuthRefreshTokenRequest;
 import com.example.deliveryappproject.domain.auth.entity.RefreshToken;
 import com.example.deliveryappproject.domain.auth.repository.RefreshTokenRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 import static com.example.deliveryappproject.domain.auth.enums.TokenStatus.INVALIDATED;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenService {
@@ -41,14 +41,12 @@ public class TokenService {
     }
 
     /* Refresh Token 유효성 검사 */
-    public User reissueToken(AuthRefreshTokenRequest request) {
-        String token = request.getRefreshToken();
+    public User reissueToken(String token) {
 
         RefreshToken refreshToken = findByTokenOrElseThrow(token);
 
-        if (refreshToken.getTokenStatus() == INVALIDATED ||
-                refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new UnauthorizedException("유효기간이 지난 refresh 토큰입니다. 다시 로그인 해주세요");
+        if (refreshToken.getTokenStatus() == INVALIDATED) {
+            throw new UnauthorizedException("사용이 만료된 refresh token 입니다.");
         }
         refreshToken.updateTokenStatus(INVALIDATED);
 

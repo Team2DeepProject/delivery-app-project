@@ -1,6 +1,7 @@
 package com.example.deliveryappproject.config;
 
 import com.example.deliveryappproject.config.argument.AuthUserArgumentResolver;
+import com.example.deliveryappproject.config.argument.RefreshTokenArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -15,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new AuthUserArgumentResolver());
+        resolvers.add(new RefreshTokenArgumentResolver());
     }
 
     /* Interceptor 등록 */
