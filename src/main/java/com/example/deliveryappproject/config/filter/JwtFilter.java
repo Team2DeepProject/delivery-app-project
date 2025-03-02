@@ -10,37 +10,31 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JwtFilter implements Filter {
+public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        Filter.super.init(filterConfig);
-    }
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-
-        String url = httpRequest.getRequestURI();
+        String url = request.getRequestURI();
 
         // 회원가입 + (로그인, 토큰 재발급)은 비로그인도 접근 가능
         if (url.equals("/auths/login") || url.equals("/auths/refresh")|| url.equals("/users/signup")) {
-            chain.doFilter(request, response);
+            filterChain.doFilter(request, response);
             return;
         }
 
         // 토큰 유무 확인 + filter 는 공통 예외처리 불가
-        String bearerJwt = httpRequest.getHeader("Authorization");
+        String bearerJwt = request.getHeader("Authorization");
         if (bearerJwt == null) {
-            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "JWT 토큰이 필요합니다.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "JWT 토큰이 필요합니다.");
             return;
         }
 
@@ -51,32 +45,27 @@ public class JwtFilter implements Filter {
 
             // 유저정보 유무 확인 + filter 는 공통 예외처리 불가
             if (claims == null) {
-                httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
                 return;
             }
 
-            httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
-            httpRequest.setAttribute("email", claims.get("email"));
-            httpRequest.setAttribute("userRole", claims.get("userRole"));
+            request.setAttribute("userId", Long.parseLong(claims.getSubject()));
+            request.setAttribute("email", claims.get("email"));
+            request.setAttribute("userRole", claims.get("userRole"));
 
-            chain.doFilter(request, response);
+            filterChain.doFilter(request, response);
         } catch (SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명입니다.");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token, 만료된 JWT token 입니다.", e);
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT 토큰입니다.");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
-            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
         } catch (Exception e) {
             log.error("Invalid JWT token, 유효하지 않는 JWT 토큰 입니다.", e);
-            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "유효하지 않는 JWT 토큰입니다.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "유효하지 않는 JWT 토큰입니다.");
         }
-    }
-
-    @Override
-    public void destroy() {
-        Filter.super.destroy();
     }
 }

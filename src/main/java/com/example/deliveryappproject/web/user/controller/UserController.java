@@ -1,7 +1,7 @@
 package com.example.deliveryappproject.web.user.controller;
 
-import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequestDto;
-import com.example.deliveryappproject.domain.user.dto.response.UserSignupResponseDto;
+import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequest;
+import com.example.deliveryappproject.domain.user.dto.response.UserSignupResponse;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class UserController {
 
     //회원가입
     @PostMapping("/signup")
-    public ResponseEntity<UserSignupResponseDto> signup(@Valid @RequestBody UserSignupRequestDto signupRequestDto) {
+    public ResponseEntity<UserSignupResponse> signup(@Valid @RequestBody UserSignupRequest signupRequestDto) {
         return ResponseEntity.ok(userService.signup(signupRequestDto));
     }
 }

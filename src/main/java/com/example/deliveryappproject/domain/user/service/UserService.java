@@ -1,10 +1,9 @@
 package com.example.deliveryappproject.domain.user.service;
 
-
 import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.config.PasswordEncoder;
-import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequestDto;
-import com.example.deliveryappproject.domain.user.dto.response.UserSignupResponseDto;
+import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequest;
+import com.example.deliveryappproject.domain.user.dto.response.UserSignupResponse;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.entity.UserRole;
 import com.example.deliveryappproject.domain.user.repository.UserRepository;
@@ -22,7 +21,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserSignupResponseDto signup(UserSignupRequestDto signupRequestDto) {
+    public UserSignupResponse signup(UserSignupRequest signupRequestDto) {
 
         if (!Objects.equals(signupRequestDto.getPassword(), signupRequestDto.getPasswordCheck())) {     // 추가
             throw new BadRequestException("비밀번호와 비밀번호 확인이 같지 않습니다.");
@@ -40,11 +39,11 @@ public class UserService {
 
         userRepository.save(newUser);
 
-        return new UserSignupResponseDto(
+        return new UserSignupResponse(
                 newUser.getId(),
                 newUser.getEmail(),
                 newUser.getUserName(),
-                newUser.getUserRole(),
+                newUser.getUserRole().name(),
                 newUser.getPoint()
         );
     }
