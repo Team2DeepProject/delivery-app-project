@@ -84,7 +84,7 @@ public class StoreService {
         findStore.updateStoreState(CLOSED);
     }
 
-    private Store findStoreByIdOrElseThrow(Long id) {
+    public Store findStoreByIdOrElseThrow(Long id) {
         return storeRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Not Found Store")
         );

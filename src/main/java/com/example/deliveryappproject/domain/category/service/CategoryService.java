@@ -23,24 +23,16 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public void createCatetory(AuthUser authUser, CategoryCreateRequest categoryCreateRequest) {
-
-        existByNameOrElseThrow(categoryCreateRequest.getName());
+    public void createCategory(AuthUser authUser, CategoryCreateRequest categoryCreateRequest) {
 
         User user = new User(authUser.getId());
         Category category = categoryCreateRequest.toEntity(user);
 
-        try {
-            categoryRepository.save(category);
-        } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("이미 존재하는 데이터입니다.");
-        }
+        categoryRepository.save(category);
     }
 
     @Transactional
     public void updateCategory(AuthUser authUser, Long categoryId, CategoryUpdateRequest categoryUpdateRequest) {
-
-        existByNameOrElseThrow(categoryUpdateRequest.getName());
 
         Category findCategory = findCategoryByIdOrElseThrow(categoryId);
 
@@ -48,31 +40,21 @@ public class CategoryService {
             throw new ForbiddenException("수정 가능한 유저가 아닙니다.");
         }
 
-        try {
-            findCategory.updateCategoryName(categoryUpdateRequest.getName());
-        } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("이미 존재하는 데이터입니다.");
-        }
+        findCategory.updateCategoryName(categoryUpdateRequest.getName());
     }
 
     public void deleteCategory(AuthUser authUser, Long categoryId) {
         Category findCategory = findCategoryByIdOrElseThrow(categoryId);
 
         if (!Objects.equals(findCategory.getUser().getId(), authUser.getId())) {
-            throw new ForbiddenException("수정 가능한 유저가 아닙니다.");
+            throw new ForbiddenException("삭제 가능한 유저가 아닙니다.");
         }
         categoryRepository.delete(findCategory);
     }
 
-    private Category findCategoryByIdOrElseThrow(Long categoryId) {
+    public Category findCategoryByIdOrElseThrow(Long categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(
                 () -> new NotFoundException("Not Found Category")
         );
-    }
-
-    private void existByNameOrElseThrow(String name) {
-        if (categoryRepository.existsByName(name)) {
-            throw new BadRequestException("이미 존재하는 카테고리입니다.");
-        }
     }
 }

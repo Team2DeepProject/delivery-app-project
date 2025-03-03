@@ -21,7 +21,7 @@ public class CategoryController {
             @Auth AuthUser authUser,
             @Valid @RequestBody CategoryCreateRequest categoryCreateRequest
     ) {
-        categoryService.createCatetory(authUser, categoryCreateRequest);
+        categoryService.createCategory(authUser, categoryCreateRequest);
     }
 
     @PatchMapping("/{categoryId}")

@@ -27,6 +27,10 @@ public class Category extends Timestamped{
         this.name = name;
     }
 
+    public Category(Long id) {
+        this.id = id;
+    }
+
     public void updateCategoryName(String name) {
         this.name = name;
     }
