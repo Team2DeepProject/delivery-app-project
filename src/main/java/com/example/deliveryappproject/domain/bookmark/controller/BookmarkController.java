@@ -6,9 +6,10 @@ import com.example.deliveryappproject.domain.bookmark.dto.response.BookmarkRespo
 import com.example.deliveryappproject.domain.bookmark.service.BookmarkService;
 import com.example.deliveryappproject.common.response.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.awt.print.Pageable;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,8 +20,8 @@ public class BookmarkController {
 
     // 즐겨찾기 조회
     @GetMapping
-    public Response<List<BookmarkResponseDto>> getUserBookmarks(@Auth AuthUser authUser) {
-        return Response.of(bookmarkService.getUserBookmarks(authUser.getId()), "즐겨찾기 조회 성공");
+    public Response<Page<BookmarkResponseDto>> getUserBookmarks(@Auth AuthUser authUser, Pageable pageable) {
+        return Response.of(bookmarkService.getUserBookmarks(authUser.getId(), pageable), "즐겨찾기 조회 성공");
     }
 
     // 즐겨찾기 등록-삭제

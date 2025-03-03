@@ -8,11 +8,11 @@ import com.example.deliveryappproject.domain.store.service.StoreService;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.awt.print.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +45,8 @@ public class BookmarkService {
 
     // 즐겨찾기 조회
     @Transactional(readOnly = true)
-    public List<BookmarkResponseDto> getUserBookmarks(Long userId) {
-        return bookmarkRepository.findByUserId(userId).stream()
-                .map(BookmarkResponseDto::fromEntity)
-                .collect(Collectors.toList());
+    public Page<BookmarkResponseDto> getUserBookmarks(Long userId, Pageable pageable) {
+        return bookmarkRepository.findByUserId(userId, pageable)
+                .map(BookmarkResponseDto::fromEntity);
     }
 }
