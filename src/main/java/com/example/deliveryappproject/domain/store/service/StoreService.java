@@ -88,4 +88,10 @@ public class StoreService {
                 () -> new BadRequestException("Not Found Store")
         );
     }
+
+    public Store findStoreById(Long storeId) {
+        return storeRepository.findById(storeId).orElseThrow(
+                () -> new BadRequestException("Not Found Store")
+        );
+    }
 }

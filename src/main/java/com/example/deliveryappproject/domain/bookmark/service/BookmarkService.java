@@ -4,7 +4,7 @@ import com.example.deliveryappproject.domain.bookmark.dto.response.BookmarkRespo
 import com.example.deliveryappproject.domain.bookmark.entity.Bookmark;
 import com.example.deliveryappproject.domain.bookmark.repository.BookmarkRepository;
 import com.example.deliveryappproject.domain.store.entity.Store;
-import com.example.deliveryappproject.domain.store.repository.StoreRepository;
+import com.example.deliveryappproject.domain.store.service.StoreService;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +20,13 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final UserService userService;
-    private final StoreRepository storeRepository;
+    private final StoreService storeService;
 
     // 토글형식 즐겨찾기 추가 삭제
     @Transactional
     public boolean toggleUserBookmark(Long storeId, Long userId) {
         User user = userService.getUserById(userId);
-        Store store = storeRepository.findById(storeId).orElseThrow(
-                () -> new RuntimeException("가게를 찾을수 없습니다.")
-        );
+        Store store = storeService.findStoreById(storeId);
 
         return bookmarkRepository.findByUserIdAndStoreId(userId, storeId)
                 .map(bookmark -> {
