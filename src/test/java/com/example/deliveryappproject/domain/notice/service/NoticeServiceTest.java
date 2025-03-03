@@ -1,5 +1,6 @@
 package com.example.deliveryappproject.domain.notice.service;
 
+import com.example.deliveryappproject.domain.notice.dto.response.NoticeResponseDto;
 import com.example.deliveryappproject.domain.notice.entity.Notice;
 import com.example.deliveryappproject.domain.notice.repository.NoticeRepository;
 import com.example.deliveryappproject.domain.store.entity.Store;
@@ -11,11 +12,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -61,5 +67,40 @@ class NoticeServiceTest {
         assertThat(noticeId).isNotNull();
         assertThat(noticeId).isEqualTo(1L);
         verify(noticeRepository, times(1)).save(any(Notice.class));
+    }
+
+    @Test
+    void 가게_없을경우_공지생성_불가() {
+        // Given
+        Long storeId = 1L;
+        given(storeRepository.existsById(storeId)).willReturn(false);
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> noticeService.createNotice(storeId, "공지 제목", "공지 내용"));
+
+        assertThat(exception.getMessage()).isEqualTo("가게 확인 불가: " + storeId);
+        verify(noticeRepository, never()).save(any(Notice.class));
+    }
+
+    @Test
+    void 공지_조회_테스트() {
+        // Given
+        Long storeId = 1L;
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Notice notice = new Notice(new Store(), "공지 제목", "공지 내용");
+        ReflectionTestUtils.setField(notice, "id", 1L);
+        Page<Notice> noticePage = new PageImpl<>(List.of(notice), pageRequest, 1);
+
+        given(storeRepository.existsById(storeId)).willReturn(true);
+        given(noticeRepository.findByStoreIdOrderByCreatedAtDesc(storeId, pageRequest)).willReturn(noticePage);
+
+        // When
+        Page<NoticeResponseDto> notices = noticeService.getStoreNotices(storeId, pageRequest);
+
+        // Then
+        assertThat(notices).isNotNull();
+        assertThat(notices.getTotalElements()).isEqualTo(1);
+        assertThat(notices.getContent().get(0).getTitle()).isEqualTo("공지 제목");
     }
 }
