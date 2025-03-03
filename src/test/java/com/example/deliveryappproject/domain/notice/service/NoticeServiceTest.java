@@ -73,6 +73,7 @@ class NoticeServiceTest {
     void 가게_없을경우_공지생성_불가() {
         // Given
         Long storeId = 1L;
+
         given(storeRepository.existsById(storeId)).willReturn(false);
 
         // When & Then
@@ -114,5 +115,22 @@ class NoticeServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> noticeService.getStoreNotices(storeId, pageRequest));
         assertThat(exception.getMessage()).isEqualTo("가게 확인 불가: " + storeId);
+    }
+
+    @Test
+    void 공지_수정_테스트() {
+        // Given
+        Notice notice = new Notice(new Store(), "공지 제목", "공지 내용");
+        ReflectionTestUtils.setField(notice, "id", 1L);
+
+        given(noticeRepository.findById(notice.getId())).willReturn(Optional.of(notice));
+
+        // When
+        Long updateNoticeId = noticeService.updateNotice(notice.getId(), "변경된 제목", "변경된 내용");
+
+        // Then
+        assertThat(updateNoticeId).isEqualTo(notice.getId());
+        assertThat(notice.getTitle()).isEqualTo("변경된 제목");
+        assertThat(notice.getContents()).isEqualTo("변경된 내용");
     }
 }
