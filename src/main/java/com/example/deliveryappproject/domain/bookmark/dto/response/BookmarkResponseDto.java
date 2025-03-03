@@ -12,6 +12,6 @@ public class BookmarkResponseDto {
     private final String storeName;
 
     public static BookmarkResponseDto fromEntity(Bookmark bookmark) {
-        return new BookmarkResponseDto(bookmark.getStore().getId(), bookmark.getStore().getName());
+        return new BookmarkResponseDto(bookmark.getStore().getId(), bookmark.getStore().getStoreName());
     }
 }
