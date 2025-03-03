@@ -7,15 +7,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name="Users")
+@Table(name="users")
 public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long userId;
+
+    @Column(unique = true)
     private String email;
     private String password;
     private String userName;
+
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private int point;
 

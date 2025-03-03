@@ -1,5 +1,6 @@
 package com.example.deliveryappproject.user.controller;
 
+import com.example.deliveryappproject.user.dto.UserResponseDto;
 import com.example.deliveryappproject.user.dto.UserSignupRequestDto;
 import com.example.deliveryappproject.user.dto.UserSignupResponseDto;
 import com.example.deliveryappproject.user.service.UserService;
@@ -7,10 +8,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,4 +24,11 @@ public class UserController {
     public ResponseEntity<UserSignupResponseDto> signup(@Valid @RequestBody UserSignupRequestDto signupRequestDto) {
         return ResponseEntity.ok(userService.signup(signupRequestDto));
     }
+
+    //회원목록 전체조회
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> findAll(){
+        return ResponseEntity.ok(userService.findAll());
+    }
+
 }

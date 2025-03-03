@@ -16,6 +16,10 @@ public class UserSignupRequestDto {
             message = "비밀번호는 8자 이상이며, 영어, 숫자, 특수문자를 최소 1글자 이상 포함해야 합니다.")
     private String password;
 
+    @NotBlank(message="패스워드 확인은 필수 항목입니다.")
+    private String passwordCheck;
+
+    @NotBlank
     private String userName;
 
     @NotBlank
