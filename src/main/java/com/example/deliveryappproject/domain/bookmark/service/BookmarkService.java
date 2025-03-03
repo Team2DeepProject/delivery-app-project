@@ -26,7 +26,7 @@ public class BookmarkService {
     @Transactional
     public boolean toggleUserBookmark(Long storeId, Long userId) {
         User user = userService.getUserById(userId);
-        Store store = storeService.findStoreById(storeId);
+        Store store = storeService.findStoreByIdOrElseThrow(storeId);
 
         return bookmarkRepository.findByUserIdAndStoreId(userId, storeId)
                 .map(bookmark -> {
