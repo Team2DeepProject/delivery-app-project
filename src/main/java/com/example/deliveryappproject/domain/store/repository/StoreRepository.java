@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
@@ -23,4 +24,9 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "WHERE s.storeState = 'ACTIVE' " +
             "ORDER BY s.modifiedAt DESC")
     Page<Store> findAllByOrderByModifiedAtDesc(Pageable pageable);
+
+    @Query("SELECT s FROM Store s " +
+            "WHERE s.id = :storeId " +
+            "AND s.storeState = 'ACTIVE'")
+    Optional<Store> findById(@Param("storeId") Long id);
 }
