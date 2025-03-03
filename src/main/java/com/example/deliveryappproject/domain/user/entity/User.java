@@ -36,4 +36,8 @@ public class User extends Timestamped { // Timestamped 추가
         this.point=0;
     }
 
+    public void update(String userName){
+        this.userName=userName;
+    }
+
 }
