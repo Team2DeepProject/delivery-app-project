@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -163,5 +164,18 @@ class NoticeServiceTest {
 
         // Then
         verify(noticeRepository, times(1)).delete(notice);
+    }
+
+    @Test
+    void 없는_공지는_삭제할수_없음() {
+        // Given
+        Long noticeId = 1L;
+        given(noticeRepository.findById(noticeId)).willReturn(Optional.empty());
+
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> noticeService.deleteNotice(noticeId, 1L));
+        assertThat(exception.getMessage()).isEqualTo("공지 확인 불가: " + noticeId);
+        verify(noticeRepository, never()).delete(any(Notice.class));
     }
 }
