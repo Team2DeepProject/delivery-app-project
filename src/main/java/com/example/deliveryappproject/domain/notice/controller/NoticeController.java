@@ -27,8 +27,7 @@ public class NoticeController {
                                        @Auth AuthUser authUser,
                                        @RequestBody NoticeRequestDto request
     ) {
-        Long newNoticeId = noticeService.createNotice(storeId, request.getTitle(), request.getContents());
-        return Response.of(newNoticeId, "공지 생성 완료");
+        return Response.of(noticeService.createNotice(storeId, request.getTitle(), request.getContents()), "공지 생성 완료");
     }
 
     // 공지 조회
@@ -36,8 +35,7 @@ public class NoticeController {
     public Response<Page<NoticeResponseDto>> getStoreNotices(@PathVariable Long storeId,
                                                              @SortDefault(sort = "createdAt", direction = DESC) Pageable pageable
     ) {
-        Page<NoticeResponseDto> notices = noticeService.getStoreNotices(storeId, pageable);
-        return Response.of(notices, "공지 조회 완료");
+        return Response.of(noticeService.getStoreNotices(storeId, pageable), "공지 조회 완료");
     }
 
     // 공지 수정
@@ -46,8 +44,7 @@ public class NoticeController {
                                        @Auth AuthUser authUser,
                                        @RequestBody NoticeRequestDto request
     ) {
-        Long updatedNoticeId = noticeService.updateNotice(authUser.getId(), noticeId, request.getTitle(), request.getContents());
-        return Response.of(updatedNoticeId, "공지 수정 완료");
+        return Response.of(noticeService.updateNotice(noticeId, request.getTitle(), request.getContents()), "공지 수정 완료");
     }
 
     // 공지 삭제

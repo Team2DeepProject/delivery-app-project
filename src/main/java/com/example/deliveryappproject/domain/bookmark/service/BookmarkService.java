@@ -6,7 +6,7 @@ import com.example.deliveryappproject.domain.bookmark.repository.BookmarkReposit
 import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
-import com.example.deliveryappproject.domain.user.repository.UserRepository;
+import com.example.deliveryappproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +19,13 @@ import java.util.stream.Collectors;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final StoreRepository storeRepository;
 
     // 토글형식 즐겨찾기 추가 삭제
     @Transactional
     public boolean toggleUserBookmark(Long storeId, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new RuntimeException("사용자를 찾을수 없습니다.")
-        );
+        User user = userService.getUserById(userId);
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new RuntimeException("가게를 찾을수 없습니다.")
         );
