@@ -32,4 +32,12 @@ public class CategoryController {
     ) {
         categoryService.updateCategory(authUser, categoryId, categoryUpdateRequest);
     }
+
+    @DeleteMapping("/{categoryId}")
+    public void deleteCategory(
+            @Auth AuthUser authUser,
+            @PathVariable Long categoryId
+    ) {
+        categoryService.deleteCategory(authUser, categoryId);
+    }
 }

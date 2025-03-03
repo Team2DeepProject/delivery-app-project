@@ -9,7 +9,6 @@ import com.example.deliveryappproject.domain.category.dto.request.CategoryUpdate
 import com.example.deliveryappproject.domain.category.entity.Category;
 import com.example.deliveryappproject.domain.category.repository.CategoryRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -54,6 +53,15 @@ public class CategoryService {
         } catch (DataIntegrityViolationException e) {
             throw new BadRequestException("이미 존재하는 데이터입니다.");
         }
+    }
+
+    public void deleteCategory(AuthUser authUser, Long categoryId) {
+        Category findCategory = findCategoryByIdOrElseThrow(categoryId);
+
+        if (!Objects.equals(findCategory.getUser().getId(), authUser.getId())) {
+            throw new ForbiddenException("수정 가능한 유저가 아닙니다.");
+        }
+        categoryRepository.delete(findCategory);
     }
 
     private Category findCategoryByIdOrElseThrow(Long categoryId) {
