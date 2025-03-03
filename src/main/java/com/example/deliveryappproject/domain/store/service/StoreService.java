@@ -41,7 +41,7 @@ public class StoreService {
             throw new BadRequestException("등록된 가게가 3개 이상입니다.");
         }
 
-        Store store = storeCreateRequest.toEntity(user);
+        Store store = StoreCreateRequest.toEntity(user, storeCreateRequest);
         storeRepository.save(store);
     }
 
@@ -49,7 +49,7 @@ public class StoreService {
     public Page<StoreGetAllResponse> getAllStore(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Store> storePage = storeRepository.findAllByOrderByModifiedAtDesc(pageable);
-        return storePage.map(StoreGetAllResponse::new);
+        return storePage.map(StoreGetAllResponse::fromDto);
     }
 
     @Transactional
