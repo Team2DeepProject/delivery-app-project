@@ -3,13 +3,12 @@ package com.example.deliveryappproject.web.store.controller;
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.domain.store.dto.request.StoreCreateRequest;
+import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
 import com.example.deliveryappproject.domain.store.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/stores")
@@ -23,5 +22,13 @@ public class StoreController {
             @Auth AuthUser authUser,
             @Valid @RequestBody StoreCreateRequest storeCreateRequest) {
         storeService.createStore(authUser, storeCreateRequest);
+    }
+
+    @GetMapping
+    public Page<StoreGetAllResponse> getAllStore(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return storeService.getAllStore(page, size);
     }
 }

@@ -26,7 +26,7 @@ public class StoreCreateRequest {
     @NotNull(message = "최소 주문 금액은 필수 항목입니다.")
     private BigDecimal minOrderPrice;
 
-    public Store toDto(User user) {
+    public Store toEntity(User user) {
         return new Store(
                 user,
                 this.storeName,

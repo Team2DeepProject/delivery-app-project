@@ -4,6 +4,7 @@ import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -11,9 +12,9 @@ import java.time.LocalTime;
 
 import static jakarta.persistence.EnumType.STRING;
 
+@Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "stores")
 public class Store extends Timestamped {
 
