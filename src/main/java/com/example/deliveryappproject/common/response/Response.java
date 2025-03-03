@@ -11,8 +11,8 @@ public class Response<T> {
 
     private Response(boolean success, T data, String message) {
         this.success = success;
-        this.data = data;
         this.message = message;
+        this.data = data;
     }
 
     public static <T> Response<T> of(T data, String message) {
