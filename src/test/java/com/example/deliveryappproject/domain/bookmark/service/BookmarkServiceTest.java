@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -49,5 +50,19 @@ class BookmarkServiceTest {
         // Then
         assertThat(isBookmarked).isTrue();
         verify(bookmarkRepository, times(1)).save(any(Bookmark.class));
+    }
+
+    @Test
+    void 확인_불가능한_사용자_즐겨찾기_예외처리() {
+        // Given
+        Long userId = 1L;
+        Long storeId = 1L;
+
+        given(userService.getUserById(userId)).willThrow(new RuntimeException("사용자를 찾을수 없음"));
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> bookmarkService.toggleUserBookmark(storeId, userId));
+        assertThat(exception.getMessage()).isEqualTo("사용자를 찾을수 없음");
     }
 }
