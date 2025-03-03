@@ -1,6 +1,7 @@
 package com.example.deliveryappproject.domain.user.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
+import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.config.PasswordEncoder;
 import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequest;
 import com.example.deliveryappproject.domain.user.dto.response.UserSignupResponse;
@@ -50,11 +51,11 @@ public class UserService {
 
     public User findUserByEmailOrElseThrow(String email) {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new BadRequestException("Not Found Email"));
+                () -> new NotFoundException("Not Found Email"));
     }
 
     public User findUserByIdOrElseThrow(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new BadRequestException("Not Found UserId"));
+                () -> new NotFoundException("Not Found UserId"));
     }
 }

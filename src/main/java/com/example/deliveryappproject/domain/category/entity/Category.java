@@ -19,10 +19,15 @@ public class Category extends Timestamped{
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(unique = true)
     private String name;
 
     public Category(User user, String name) {
         this.user = user;
+        this.name = name;
+    }
+
+    public void updateCategoryName(String name) {
         this.name = name;
     }
 }
