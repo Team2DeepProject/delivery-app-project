@@ -26,17 +26,17 @@ public class MenuController {
         return ResponseEntity.ok(menuService.saveMenu(authUser.getId(), authUser.getUserRole(), dto));
     }
 
-    //전체 메뉴 조회
-//    @GetMapping
-//    public ResponseEntity<List<MenuResponse>> findAll(){
-//        return ResponseEntity.ok(menuService.findAll());
-//    }
+//    전체 메뉴 조회
+    @GetMapping
+    public ResponseEntity<List<MenuResponse>> findAll(){
+        return ResponseEntity.ok(menuService.findAll());
+    }
 
-    //단건 메뉴 조회
-//    @GetMapping("{/menuId}")
-//    public ResponseEntity<MenuResponse> findByMenuId(@PathVariable Long menuId){
-//        return ResponseEntity.ok(menuService.findByMenuId(menuId));
-//    }
+//    단건 메뉴 조회
+    @GetMapping("/{menuId}")
+    public ResponseEntity<MenuResponse> findByMenuId(@PathVariable Long menuId){
+        return ResponseEntity.ok(menuService.findByMenuId(menuId));
+    }
 
 
 
