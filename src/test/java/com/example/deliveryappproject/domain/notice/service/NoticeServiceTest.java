@@ -109,6 +109,7 @@ class NoticeServiceTest {
         // Given
         Long storeId = 1L;
         PageRequest pageRequest = PageRequest.of(0, 10);
+
         given(storeRepository.existsById(storeId)).willReturn(false);
 
         // When & Then
@@ -132,5 +133,18 @@ class NoticeServiceTest {
         assertThat(updateNoticeId).isEqualTo(notice.getId());
         assertThat(notice.getTitle()).isEqualTo("변경된 제목");
         assertThat(notice.getContents()).isEqualTo("변경된 내용");
+    }
+
+    @Test
+    void 없는_공지는_수정할수_없음() {
+        // Given
+        Long noticeId = 1L;
+
+        given(noticeRepository.findById(noticeId)).willReturn(Optional.empty());
+
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> noticeService.updateNotice(noticeId, "변경된 제목", "변경된 내용"));
+        assertThat(exception.getMessage()).isEqualTo("공지 확인 불가: " + noticeId);
     }
 }
