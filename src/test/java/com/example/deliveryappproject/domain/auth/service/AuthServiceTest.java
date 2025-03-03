@@ -1,12 +1,10 @@
-package com.example.deliveryappproject.domain.auth;
+package com.example.deliveryappproject.domain.auth.service;
 
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
 import com.example.deliveryappproject.config.PasswordEncoder;
 import com.example.deliveryappproject.domain.auth.dto.request.AuthLoginRequest;
 import com.example.deliveryappproject.domain.auth.dto.response.AuthTokenResponse;
-import com.example.deliveryappproject.domain.auth.service.AuthService;
-import com.example.deliveryappproject.domain.auth.service.TokenService;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.entity.UserRole;
 import com.example.deliveryappproject.domain.user.service.UserService;
