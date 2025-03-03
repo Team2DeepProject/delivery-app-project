@@ -1,5 +1,6 @@
 package com.example.deliveryappproject.domain.auth.service;
 
+import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
 import com.example.deliveryappproject.config.JwtUtil;
 import com.example.deliveryappproject.domain.auth.entity.RefreshToken;
@@ -7,14 +8,10 @@ import com.example.deliveryappproject.domain.auth.repository.RefreshTokenReposit
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 import static com.example.deliveryappproject.domain.auth.enums.TokenStatus.INVALIDATED;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenService {
@@ -55,11 +52,11 @@ public class TokenService {
 
     private RefreshToken findByTokenOrElseThrow(String token) {
         return refreshTokenRepository.findByToken(token).orElseThrow(
-                () -> new UnauthorizedException("Not Found Token"));
+                () -> new NotFoundException("Not Found Token"));
     }
 
     private RefreshToken findRefreshTokenById(Long userId) {
         return refreshTokenRepository.findById(userId).orElseThrow(
-                () -> new UnauthorizedException("해당 유저의 Token이 존재하지 않음."));
+                () -> new NotFoundException("Not Found Token"));
     }
 }
