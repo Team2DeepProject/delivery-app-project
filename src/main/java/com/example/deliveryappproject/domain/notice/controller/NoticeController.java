@@ -1,5 +1,7 @@
 package com.example.deliveryappproject.domain.notice.controller;
 
+import com.example.deliveryappproject.common.annotation.Auth;
+import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.domain.notice.dto.request.NoticeRequestDto;
 import com.example.deliveryappproject.domain.notice.dto.response.NoticeResponseDto;
 import com.example.deliveryappproject.domain.notice.service.NoticeService;
@@ -22,10 +24,11 @@ public class NoticeController {
     // 공지 생성
     @PostMapping("/{storeId}")
     public Response<Long> createNotice(@PathVariable Long storeId,
-                                       @SessionAttribute(name = "userId") Long userId,
+                                       @Auth AuthUser authUser,
                                        @RequestBody NoticeRequestDto request
     ) {
-        return Response.of(noticeService.createNotice(storeId, request.getTitle(), request.getContents()), "공지 생성 완료");
+        Long newNoticeId = noticeService.createNotice(storeId, request.getTitle(), request.getContents());
+        return Response.of(newNoticeId, "공지 생성 완료");
     }
 
     // 공지 조회
@@ -33,24 +36,26 @@ public class NoticeController {
     public Response<Page<NoticeResponseDto>> getStoreNotices(@PathVariable Long storeId,
                                                              @SortDefault(sort = "createdAt", direction = DESC) Pageable pageable
     ) {
-        return Response.of(noticeService.getStoreNotices(storeId, pageable), "공지 조회 완료");
+        Page<NoticeResponseDto> notices = noticeService.getStoreNotices(storeId, pageable);
+        return Response.of(notices, "공지 조회 완료");
     }
 
     // 공지 수정
     @PutMapping("/{noticeId}")
     public Response<Long> updateNotice(@PathVariable Long noticeId,
-                                       @SessionAttribute(name = "userId") Long userId,
+                                       @Auth AuthUser authUser,
                                        @RequestBody NoticeRequestDto request
     ) {
-        return Response.of(noticeService.updateNotice(noticeId, request.getTitle(), request.getContents()), "공지 수정 완료");
+        Long updatedNoticeId = noticeService.updateNotice(authUser.getId(), noticeId, request.getTitle(), request.getContents());
+        return Response.of(updatedNoticeId, "공지 수정 완료");
     }
 
     // 공지 삭제
     @DeleteMapping("/{noticeId}")
     public Response<Void> deleteNotice(@PathVariable Long noticeId,
-                                       @SessionAttribute(name = "userId") Long userId
+                                       @Auth AuthUser authUser
     ) {
-        noticeService.deleteNotice(noticeId);
+        noticeService.deleteNotice(authUser.getId(), noticeId);
         return Response.empty("공지 삭제 완료");
     }
 }

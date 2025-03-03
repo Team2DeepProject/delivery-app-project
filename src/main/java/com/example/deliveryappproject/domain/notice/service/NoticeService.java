@@ -47,7 +47,7 @@ public class NoticeService {
 
     // 공지 수정
     @Transactional
-    public Long updateNotice(Long noticeId, String title, String contents) {
+    public Long updateNotice(Long noticeId, Long id, String title, String contents) {
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(
                 () -> new RuntimeException("공지 확인 불가: " + noticeId)
         );
@@ -57,7 +57,7 @@ public class NoticeService {
 
     // 공지 삭제
     @Transactional
-    public void deleteNotice(Long noticeId) {
+    public void deleteNotice(Long noticeId, Long id) {
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(
                 () -> new RuntimeException("공지 확인 불가: " + noticeId)
         );
