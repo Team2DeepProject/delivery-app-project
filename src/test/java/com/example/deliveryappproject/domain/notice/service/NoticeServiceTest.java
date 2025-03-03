@@ -23,6 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -146,5 +147,21 @@ class NoticeServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> noticeService.updateNotice(noticeId, "변경된 제목", "변경된 내용"));
         assertThat(exception.getMessage()).isEqualTo("공지 확인 불가: " + noticeId);
+    }
+
+    @Test
+    void 공지_삭제_테스트() {
+        // Given
+        Notice notice = new Notice(new Store(), "공지 제목", "공지 내용");
+        ReflectionTestUtils.setField(notice, "id", 1L);
+
+        given(noticeRepository.findById(notice.getId())).willReturn(Optional.of(notice));
+        willDoNothing().given(noticeRepository).delete(notice);
+
+        // When
+        noticeService.deleteNotice(notice.getId(), 1L);
+
+        // Then
+        verify(noticeRepository, times(1)).delete(notice);
     }
 }
