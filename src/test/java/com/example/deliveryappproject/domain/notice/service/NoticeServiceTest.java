@@ -78,7 +78,6 @@ class NoticeServiceTest {
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> noticeService.createNotice(storeId, "공지 제목", "공지 내용"));
-
         assertThat(exception.getMessage()).isEqualTo("가게 확인 불가: " + storeId);
         verify(noticeRepository, never()).save(any(Notice.class));
     }
@@ -102,5 +101,18 @@ class NoticeServiceTest {
         assertThat(notices).isNotNull();
         assertThat(notices.getTotalElements()).isEqualTo(1);
         assertThat(notices.getContent().get(0).getTitle()).isEqualTo("공지 제목");
+    }
+
+    @Test
+    void 없는_가게의_공지_조회시_예외처리() {
+        // Given
+        Long storeId = 1L;
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        given(storeRepository.existsById(storeId)).willReturn(false);
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> noticeService.getStoreNotices(storeId, pageRequest));
+        assertThat(exception.getMessage()).isEqualTo("가게 확인 불가: " + storeId);
     }
 }
