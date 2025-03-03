@@ -9,10 +9,10 @@ import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +40,6 @@ public class BookmarkService {
                             .build());
                     return true;
                 });
-
     }
 
     // 즐겨찾기 조회

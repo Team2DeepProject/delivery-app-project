@@ -7,9 +7,9 @@ import com.example.deliveryappproject.domain.bookmark.service.BookmarkService;
 import com.example.deliveryappproject.common.response.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.print.Pageable;
 
 @RestController
 @RequiredArgsConstructor

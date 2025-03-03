@@ -1,5 +1,7 @@
 package com.example.deliveryappproject.domain.bookmark.service;
 
+import com.example.deliveryappproject.common.response.Response;
+import com.example.deliveryappproject.domain.bookmark.dto.response.BookmarkResponseDto;
 import com.example.deliveryappproject.domain.bookmark.entity.Bookmark;
 import com.example.deliveryappproject.domain.bookmark.repository.BookmarkRepository;
 import com.example.deliveryappproject.domain.store.entity.Store;
@@ -11,7 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,5 +71,29 @@ class BookmarkServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> bookmarkService.toggleUserBookmark(storeId, userId));
         assertThat(exception.getMessage()).isEqualTo("사용자를 찾을수 없음");
+    }
+
+    @Test
+    void 즐겨찾기_조회() {
+        // Given
+        Long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        User user = new User(userId);
+        Store store1 = new Store(user, "중식가게", null, null, null);
+        Store store2 = new Store(user, "양식가게", null, null, null);
+        Bookmark bookmark1 = new Bookmark(user, store1);
+        Bookmark bookmark2 = new Bookmark(user, store2);
+
+        Page<Bookmark> bookmarkPage = new PageImpl<>(List.of(bookmark1, bookmark2), pageable, 2);
+
+        given(bookmarkRepository.findByUserId(userId, pageable)).willReturn(bookmarkPage);
+
+        // When
+        Page<BookmarkResponseDto> bookmarks = bookmarkService.getUserBookmarks(userId, pageable);
+
+        // Then
+        assertThat(bookmarks).isNotNull();
+        assertThat(bookmarks.getContent()).isNotNull();
+        assertThat(bookmarks.getContent()).hasSize(2);
     }
 }
