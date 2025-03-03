@@ -7,7 +7,6 @@ import com.example.deliveryappproject.domain.store.dto.request.StoreCreateReques
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
 import com.example.deliveryappproject.domain.store.entity.Store;
-import com.example.deliveryappproject.domain.store.entity.StoreState;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
