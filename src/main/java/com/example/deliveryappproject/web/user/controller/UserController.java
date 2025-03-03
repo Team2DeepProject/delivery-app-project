@@ -56,4 +56,5 @@ public class UserController {
         userService.deleteUser(authUser.getId(), dto);
         return ResponseEntity.ok("회원탈퇴가 되었습니다.");
     }
+
 }

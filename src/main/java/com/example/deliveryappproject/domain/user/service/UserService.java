@@ -46,13 +46,6 @@ public class UserService {
 
         userRepository.save(newUser);
 
-//        return new UserSignupResponse(
-//                newUser.getId(),
-//                newUser.getEmail(),
-//                newUser.getUserName(),
-//                newUser.getUserRole().name(),
-//                newUser.getPoint()
-//        );
     }
 
     @Transactional(readOnly = true)

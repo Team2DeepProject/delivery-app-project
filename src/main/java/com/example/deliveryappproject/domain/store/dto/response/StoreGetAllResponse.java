@@ -35,7 +35,7 @@ public class StoreGetAllResponse {
     public static StoreGetAllResponse fromDto(Store store) {
         return StoreGetAllResponse.builder()
                 .id(store.getId())
-                .userName(store.getStoreName())
+                .userName(store.getUser().getUserName())
                 .storeName(store.getStoreName())
                 .storeState(store.getStoreState().name())
                 .openAt(store.getOpenAt())

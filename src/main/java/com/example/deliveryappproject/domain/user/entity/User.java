@@ -1,9 +1,12 @@
 package com.example.deliveryappproject.domain.user.entity;
 
 import com.example.deliveryappproject.common.entity.Timestamped;
+import com.example.deliveryappproject.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Entity
@@ -13,16 +16,19 @@ public class User extends Timestamped { // Timestamped 추가
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;        // userId-> id로 수정
+    private Long id;
 
-    @Column(unique = true)      // 이메일 유니크화
+    @Column(unique = true)
     private String email;
     private String password;
     private String userName;
 
-    @Enumerated(EnumType.STRING) // 추가
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private int point;
+
+    @OneToMany(mappedBy = "user")
+    private List<Store> storeList;
 
     public User(Long id) {
         this.id = id;
