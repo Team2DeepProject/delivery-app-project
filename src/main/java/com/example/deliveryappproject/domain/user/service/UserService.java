@@ -73,7 +73,6 @@ public class UserService {
     public User findUserByEmailOrElseThrow(String email) {
         return userRepository.findByEmail(email).orElseThrow(
                 () -> new BadRequestException("Not Found Email"));
-
     }
 
     @Transactional(readOnly = true)
