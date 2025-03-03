@@ -11,6 +11,7 @@ import com.example.deliveryappproject.domain.user.dto.response.UserUpdateRespons
 import com.example.deliveryappproject.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,11 @@ public class UserController {
 
     //회원목록 전체조회
     @GetMapping
-    public ResponseEntity<List<UserResponse>> findAll(){
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<Page<UserResponse>> findAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        return ResponseEntity.ok(userService.findAll(page, size));
     }
 
     //로그인 회원 정보 조회

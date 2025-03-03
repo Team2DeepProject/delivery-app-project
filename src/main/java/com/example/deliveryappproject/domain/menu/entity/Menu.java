@@ -1,9 +1,9 @@
 package com.example.deliveryappproject.domain.menu.entity;
 
 
+import com.example.deliveryappproject.domain.menu.enums.MenuState;
 import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.common.entity.Timestamped;
-import com.example.deliveryappproject.domain.store.entity.StoreState;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

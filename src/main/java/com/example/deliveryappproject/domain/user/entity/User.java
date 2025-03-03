@@ -2,6 +2,8 @@ package com.example.deliveryappproject.domain.user.entity;
 
 import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.store.entity.Store;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserState;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,10 @@ public class User extends Timestamped { // Timestamped 추가
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    @Enumerated(EnumType.STRING)
+    private UserState userState;
+
     private int point;
 
     @OneToMany(mappedBy = "user")
@@ -40,10 +46,15 @@ public class User extends Timestamped { // Timestamped 추가
         this.userName=userName;
         this.userRole=userRole;
         this.point=0;
+        this.userState=UserState.ACTIVE;
     }
 
     public void update(String userName){
         this.userName=userName;
+    }
+
+    public void setUserState(UserState userState){
+        this.userState=userState;
     }
 
 }

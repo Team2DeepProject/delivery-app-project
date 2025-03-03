@@ -1,6 +1,7 @@
 package com.example.deliveryappproject.domain.user.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
+import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.config.PasswordEncoder;
 import com.example.deliveryappproject.domain.user.dto.request.UserDeleteRequest;
 import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequest;
@@ -8,17 +9,17 @@ import com.example.deliveryappproject.domain.user.dto.request.UserUpdateRequest;
 import com.example.deliveryappproject.domain.user.dto.response.UserResponse;
 import com.example.deliveryappproject.domain.user.dto.response.UserUpdateResponse;
 import com.example.deliveryappproject.domain.user.entity.User;
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserState;
 import com.example.deliveryappproject.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
-import static java.util.regex.Pattern.matches;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +28,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    //회원가입
     @Transactional
     public void signup(UserSignupRequest signupRequestDto) {
 
-        if (!Objects.equals(signupRequestDto.getPassword(), signupRequestDto.getPasswordCheck())) {     // 추가
+        if (!Objects.equals(signupRequestDto.getPassword(), signupRequestDto.getPasswordCheck())) {
             throw new BadRequestException("비밀번호와 비밀번호 확인이 같지 않습니다.");
         }
 
@@ -48,32 +50,35 @@ public class UserService {
 
     }
 
+    //회원 전체 조회
     @Transactional(readOnly = true)
-    public List<UserResponse> findAll() {
-        List<User> user = userRepository.findAll();
-        List<UserResponse> users = new ArrayList<>();
-        for (User u : user) {
-            users.add(new UserResponse(u.getId(),
-                    u.getEmail(),
-                    u.getUserName(),
-                    u.getUserRole().toString(),
-                    u.getPoint()));
-        }
+    public Page<UserResponse> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<User> user = userRepository.findAll(pageable);
+        Page<UserResponse> users = user.map(User ->
+           new UserResponse(User.getId(),
+                   User.getEmail(),
+                   User.getUserName(),
+                   User.getUserRole().toString(),
+                   User.getPoint()));
+
         return users;
     }
 
     @Transactional(readOnly = true)
     public User findUserByEmailOrElseThrow(String email) {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new BadRequestException("Not Found Email"));
+                () -> new NotFoundException("Not Found Email"));
     }
 
     @Transactional(readOnly = true)
     public User findUserByIdOrElseThrow(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new BadRequestException("Not Found UserId"));
+                () -> new NotFoundException("Not Found UserId"));
     }
 
+    //로그인한 회원 정보 조회
     @Transactional
     public UserResponse fetchProfile(Long id) {
         User user = findUserByIdOrElseThrow(id);
@@ -85,6 +90,7 @@ public class UserService {
                 user.getPoint());
     }
 
+    //닉네임 수정
     @Transactional
     public UserUpdateResponse updateUserName(Long id, UserUpdateRequest dto) {
         User user = findUserByIdOrElseThrow(id);
@@ -96,6 +102,7 @@ public class UserService {
         );
     }
 
+    //회원 탈퇴
     @Transactional
     public void deleteUser(Long id, UserDeleteRequest dto) {
         User user = findUserByIdOrElseThrow(id);
@@ -103,6 +110,6 @@ public class UserService {
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
             throw new BadRequestException("비밀번호가 맞지 않습니다.");
 
-        userRepository.delete(user);
+        user.setUserState(UserState.DELETE);
     }
 }
