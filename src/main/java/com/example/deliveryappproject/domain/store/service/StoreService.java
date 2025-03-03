@@ -7,6 +7,7 @@ import com.example.deliveryappproject.domain.store.dto.request.StoreCreateReques
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
 import com.example.deliveryappproject.domain.store.entity.Store;
+import com.example.deliveryappproject.domain.store.entity.StoreState;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.Bidi;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.deliveryappproject.domain.store.entity.StoreState.CLOSED;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +70,17 @@ public class StoreService {
                 storeUpdateRequest.getMinOrderPrice() : findStore.getMinOrderPrice();
 
         findStore.updateStore(storeName, openAt, closeAt, minOrderPrice);
+    }
+
+    @Transactional
+    public void deleteStore(AuthUser authUser, Long storeId) {
+        Store findStore = findStoreByIdOrElseThrow(storeId);
+
+        if (!Objects.equals(findStore.getUser().getId(), authUser.getId())) {
+            throw new ForbiddenException("삭제 가능한 유저가 아닙니다.");
+        }
+
+        findStore.updateStoreState(CLOSED);
     }
 
     private Store findStoreByIdOrElseThrow(Long id) {

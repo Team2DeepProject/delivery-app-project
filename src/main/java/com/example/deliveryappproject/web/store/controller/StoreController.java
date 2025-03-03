@@ -46,4 +46,12 @@ public class StoreController {
     ) {
         storeService.updateStore(authUser, storeId, storeUpdateRequest);
     }
+
+    @DeleteMapping("/{storeId}")
+    public void deleteStore(
+            @Auth AuthUser authUser,
+            @PathVariable Long storeId
+    ) {
+        storeService.deleteStore(authUser, storeId);
+    }
 }
