@@ -20,4 +20,9 @@ public class Category extends Timestamped{
     private User user;
 
     private String name;
+
+    public Category(User user, String name) {
+        this.user = user;
+        this.name = name;
+    }
 }
