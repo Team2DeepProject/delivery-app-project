@@ -1,5 +1,7 @@
 package com.example.deliveryappproject.domain.bookmark.entity;
 
+import com.example.deliveryappproject.domain.store.entity.Store;
+import com.example.deliveryappproject.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
