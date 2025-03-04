@@ -112,4 +112,9 @@ public class UserService {
 
         user.setUserState(UserState.DELETE);
     }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new BadRequestException("Not Found UserId"));
+    }
 }

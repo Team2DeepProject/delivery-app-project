@@ -3,7 +3,6 @@ package com.example.deliveryappproject.domain.store.entity;
 import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
