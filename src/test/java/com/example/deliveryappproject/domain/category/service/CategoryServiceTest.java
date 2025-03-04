@@ -45,6 +45,7 @@ public class CategoryServiceTest {
         verify(categoryRepository, times(1)).save(any(Category.class));
     }
 
+    /* updateCategory */
     @Test
     void 카테고리수정_이름_수정_성공() {
         // given
@@ -82,6 +83,7 @@ public class CategoryServiceTest {
                 "수정 가능한 유저가 아닙니다.");
     }
 
+    /* deleteCategory */
     @Test
     void 카테고리삭제_성공() {
         // given
@@ -98,6 +100,7 @@ public class CategoryServiceTest {
         verify(categoryRepository, times(1)).delete(any(Category.class));
     }
 
+    /* findCategoryByIdOrElseThrow */
     @Test
     void 카테고리삭제_작성자가_아닐시_실패() {
         // given

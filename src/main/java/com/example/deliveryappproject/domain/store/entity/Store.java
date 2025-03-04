@@ -47,6 +47,11 @@ public class Store extends Timestamped {
         this.minOrderPrice = minOrderPrice;
     }
 
+    public Store(Long id, User user) {
+        this.id = id;
+        this.user = user;
+    }
+
     public void updateStoreState(StoreState storeState) {
         this.storeState = storeState;
     }
