@@ -57,7 +57,7 @@ public class StoreService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Store> storePage = storeRepository.findAllByOrderByModifiedAtDesc(pageable);
         return storePage.map( store -> {
-            int bookmarkCount = bookmarkCountService.getCountByStoreId(store.getId());
+            int bookmarkCount = bookmarkCountService.findByStoreId(store.getId()).size();
             return StoreGetAllResponse.fromDto(store, bookmarkCount);
         });
     }
@@ -65,7 +65,7 @@ public class StoreService {
     @Transactional
     public StoreGetResponse<Page<MenuResponse>> getStore(Long storeId, int page, int size) {
         Store findStore = findStoreByIdOrElseThrow(storeId);
-        int bookmarkCount = bookmarkCountService.getCountByStoreId(storeId);
+        int bookmarkCount = bookmarkCountService.findByStoreId(storeId).size();
         Page<MenuResponse> menuPage = menuService.findByStoreId(page, size, storeId);
 
         return StoreGetResponse.fromDto(findStore, bookmarkCount, menuPage);
