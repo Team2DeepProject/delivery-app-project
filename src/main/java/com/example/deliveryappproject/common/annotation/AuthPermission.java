@@ -1,6 +1,6 @@
 package com.example.deliveryappproject.common.annotation;
 
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

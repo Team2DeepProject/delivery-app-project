@@ -57,4 +57,5 @@ public class Store extends Timestamped {
         this.closeAt = closeAt;
         this.minOrderPrice = minOrderPrice;
     }
+
 }
