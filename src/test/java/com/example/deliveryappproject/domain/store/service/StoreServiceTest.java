@@ -4,9 +4,14 @@ import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
+import com.example.deliveryappproject.domain.bookmark.service.BookmarkCountService;
+import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
+import com.example.deliveryappproject.domain.menu.enums.MenuState;
+import com.example.deliveryappproject.domain.menu.service.MenuService;
 import com.example.deliveryappproject.domain.store.dto.request.StoreCreateRequest;
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
+import com.example.deliveryappproject.domain.store.dto.response.StoreGetResponse;
 import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.domain.store.entity.StoreState;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
@@ -23,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +43,16 @@ public class StoreServiceTest {
 
     @Mock
     private StoreRepository storeRepository;
+    @Mock
+    private BookmarkCountService bookmarkCountService;
+    @Mock
+    private MenuService menuService;
     @InjectMocks
     private StoreService storeService;
 
     /* createStore */
     @Test
-    void createStore에서_등록된_가게가_3개미만일_경우_정상적으로_가게를_저장할_수_있는가() {
+    void 가게작성_등록가게_3개_미만이면_성공() {
         // given
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
         StoreCreateRequest storeCreateRequest = new StoreCreateRequest("store name", LocalTime.of(8, 0), LocalTime.of(20, 0), BigDecimal.valueOf(20000));
@@ -56,7 +66,7 @@ public class StoreServiceTest {
     }
 
     @Test
-    void createStore에서_등록된_가게가_3개이상일_경우_BadRequestException를_던지는가() {
+    void 가게작성_등록가게_3개_이상이면_실패() {
         // given
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
         StoreCreateRequest storeCreateRequest = new StoreCreateRequest("store name", LocalTime.of(8, 0), LocalTime.of(20, 0), BigDecimal.valueOf(20000));
@@ -73,30 +83,72 @@ public class StoreServiceTest {
 
     /* getAllStore */
     @Test
-    void getAllStore에서_정상적으로_가게_목록을_조회할_수_있는가() {
+    void 가게다건조회_가게목록과_즐겨찾기수_조회_성공() {
         // given
-        int page = 1;
-        int size = 10;
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Store store1 = new Store(1L, "한식가게", LocalTime.of(8, 0), LocalTime.of(21, 0), BigDecimal.valueOf(20000));
+        Store store2 = new Store(2L, "중식가게", LocalTime.of(10, 0), LocalTime.of(22, 0), BigDecimal.valueOf(15000));
 
-        Store store1 = new Store(new User(1L), "Store A", LocalTime.of(9, 0), LocalTime.of(22, 0), BigDecimal.valueOf(15000));
-        Store store2 = new Store(new User(2L), "Store B", LocalTime.of(10, 0), LocalTime.of(23, 0), BigDecimal.valueOf(12000));
-        List<Store> storeList = List.of(store1, store2);
-        Page<Store> storePage = new PageImpl<>(storeList, pageable, storeList.size());
+        List<Store> stores = List.of(store1, store2);
+        Page<Store> storePage = new PageImpl<>(stores);
 
+        Pageable pageable = PageRequest.of(0, 10);
         given(storeRepository.findAllByOrderByModifiedAtDesc(pageable)).willReturn(storePage);
+        given(bookmarkCountService.getCountByStoreId(store1.getId())).willReturn(10);
+        given(bookmarkCountService.getCountByStoreId(store2.getId())).willReturn(5);
 
         // when
-        Page<StoreGetAllResponse> result = storeService.getAllStore(page, size);
+        Page<StoreGetAllResponse> result = storeService.getAllStore(1, 10);
 
-        // then
-        assertNotNull(result);
+        // when
+        assertEquals(2, result.getTotalElements());
+        assertEquals("한식가게", result.getContent().get(0).getStoreName());
+        assertEquals(10, result.getContent().get(0).getBookmarkCount());
+        assertEquals("중식가게", result.getContent().get(1).getStoreName());
+        assertEquals(5, result.getContent().get(1).getBookmarkCount());
+
         verify(storeRepository, times(1)).findAllByOrderByModifiedAtDesc(pageable);
+        verify(bookmarkCountService, times(1)).getCountByStoreId(store1.getId());
+        verify(bookmarkCountService, times(1)).getCountByStoreId(store2.getId());
+    }
+
+    /* getStore */
+    @Test
+    void 가게단건조회_가게정보와_즐겨찾기수와_메뉴목록조회_성공() {
+        // given
+        Long storeId = 1L;
+        Store store = new Store(storeId, "한식가게", LocalTime.of(8, 0), LocalTime.of(21, 0), BigDecimal.valueOf(20000));
+        int bookmarkCount = 10;
+        int page = 1;
+        int size = 10;
+
+        MenuResponse menu1 = new MenuResponse(1L, "menu1", BigDecimal.valueOf(7000), "정보1", String.valueOf(MenuState.SALE),"한식가게");
+        MenuResponse menu2 = new MenuResponse(2L, "menu2", BigDecimal.valueOf(8000), "정보2", String.valueOf(MenuState.SALE),"한식가게");
+        List<MenuResponse> menus = List.of(menu1, menu2);
+        Page<MenuResponse> menuPage = new PageImpl<>(menus);
+
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
+        given(bookmarkCountService.getCountByStoreId(anyLong())).willReturn(bookmarkCount);
+        given(menuService.findByStoreId(anyInt(), anyInt(), anyLong())).willReturn(menuPage);
+
+        // When
+        StoreGetResponse<Page<MenuResponse>> result = storeService.getStore(storeId, page, size);
+
+        // Then
+        assertEquals(store.getStoreName(), result.getStoreName());
+        assertEquals(bookmarkCount, result.getBookmarkCount());
+        assertEquals(store.getOpenAt(), result.getOpenAt());
+        assertEquals(store.getCloseAt(), result.getCloseAt());
+        assertEquals(store.getMinOrderPrice().intValue(), result.getMinOrderPrice());
+        assertEquals(menuPage, result.getMenu());
+
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(bookmarkCountService, times(1)).getCountByStoreId(storeId);
+        verify(menuService, times(1)).findByStoreId(page, size, storeId);
     }
 
     /* updateStore */
     @Test
-    void updateStore에서_모든_입력값을_받아_업데이트_할_수_있는가() {
+    void 가게수정_모든_입력값_수정_성공() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
@@ -109,7 +161,7 @@ public class StoreServiceTest {
 
         StoreUpdateRequest storeUpdateRequest = new StoreUpdateRequest(newStoreName, newOpenAt, newCloseAt, newMinOrderPrice);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when
         storeService.updateStore(authUser, storeId, storeUpdateRequest);
@@ -122,7 +174,7 @@ public class StoreServiceTest {
     }
 
     @Test
-    void updateStore에서_가게를_작성한_주인이_아닌_유저에_대해_ForbiddenException를_던질_수_있는가() {
+    void 가게수정_작성한_유저가_아닐시_실패() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
@@ -135,7 +187,7 @@ public class StoreServiceTest {
 
         StoreUpdateRequest storeUpdateRequest = new StoreUpdateRequest(newStoreName, newOpenAt, newCloseAt, newMinOrderPrice);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when & then
         assertThrows(ForbiddenException.class,
@@ -144,7 +196,7 @@ public class StoreServiceTest {
     }
 
     @Test
-    void updateStore에서_가게이름만_수정할_수_있는가() {
+    void 가게수정_가게이름만_수정시_성공() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
@@ -153,7 +205,7 @@ public class StoreServiceTest {
         String newStoreName = "newStoreName";
         StoreUpdateRequest storeUpdateRequest = new StoreUpdateRequest(newStoreName, null, null, null);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when
         storeService.updateStore(authUser, storeId, storeUpdateRequest);
@@ -163,7 +215,7 @@ public class StoreServiceTest {
     }
 
     @Test
-    void updateStore에서_오픈시간만_수정할_수_있는가() {
+    void 가게수정_오픈시간만_수정시_성공() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
@@ -172,7 +224,7 @@ public class StoreServiceTest {
         LocalTime newOpenAt = LocalTime.of(9, 0);
         StoreUpdateRequest storeUpdateRequest = new StoreUpdateRequest(null, newOpenAt, null, null);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when
         storeService.updateStore(authUser, storeId, storeUpdateRequest);
@@ -182,7 +234,7 @@ public class StoreServiceTest {
     }
 
     @Test
-    void updateStore에서_마감시간만_수정할_수_있는가() {
+    void 가게수정_닫는시간만_수정시_성공() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
@@ -191,7 +243,7 @@ public class StoreServiceTest {
         LocalTime newCloseAt = LocalTime.of(21, 0);
         StoreUpdateRequest storeUpdateRequest = new StoreUpdateRequest(null, null, newCloseAt, null);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when
         storeService.updateStore(authUser, storeId, storeUpdateRequest);
@@ -201,7 +253,7 @@ public class StoreServiceTest {
     }
 
     @Test
-    void updateStore에서_최소주문금액만_수정할_수_있는가() {
+    void 가게수정_최소주문금액만_수정시_성공() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
@@ -210,7 +262,7 @@ public class StoreServiceTest {
         BigDecimal newMinOrderPrice = BigDecimal.valueOf(20000);
         StoreUpdateRequest storeUpdateRequest = new StoreUpdateRequest(null, null, null, newMinOrderPrice);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when
         storeService.updateStore(authUser, storeId, storeUpdateRequest);
@@ -221,13 +273,13 @@ public class StoreServiceTest {
 
     /* deleteStore */
     @Test
-    void deleteStore에서_가게를_정상적으로_삭제할_수_있는가() {
+    void 가게삭제_등록된_가게삭제_성공() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
         Store store = new Store(new User(authUser.getId()), "storeName", LocalTime.of(8, 0), LocalTime.of(20, 0), BigDecimal.valueOf(15000));
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when
         storeService.deleteStore(authUser, storeId);
@@ -237,13 +289,13 @@ public class StoreServiceTest {
     }
 
     @Test
-    void deleteStore에서_가게를_작성한_주인이_아닌_유저에_대해_ForbiddenException를_던지는가() {
+    void 가게삭제_작성한_유저가_아닐시_실패() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
         Store store = new Store(new User(2L), "storeName", LocalTime.of(8, 0), LocalTime.of(20, 0), BigDecimal.valueOf(15000));
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
         // when & then
         assertThrows(ForbiddenException.class,
@@ -252,12 +304,12 @@ public class StoreServiceTest {
     }
 
     @Test
-    void deleteStore에서_해당되는_가게가_없을_경우_NotFoundException를_던지는가() {
+    void 가게삭제_가게가_없을경우_실패() {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+        given(storeRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
         assertThrows(NotFoundException.class,
