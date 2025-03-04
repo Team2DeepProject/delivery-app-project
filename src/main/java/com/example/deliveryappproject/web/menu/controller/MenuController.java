@@ -1,10 +1,12 @@
 package com.example.deliveryappproject.web.menu.controller;
 
 import com.example.deliveryappproject.common.annotation.Auth;
+import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.domain.menu.dto.MenuRequest;
 import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
 import com.example.deliveryappproject.domain.menu.service.MenuService;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,10 +23,11 @@ public class MenuController {
     private final MenuService menuService;
 
     //메뉴 생성
+    @AuthPermission(role = UserRole.OWNER)
     @PostMapping
     public ResponseEntity<MenuResponse> saveMenu(@Auth AuthUser authUser,
                                                  @RequestBody MenuRequest dto) {
-        return ResponseEntity.ok(menuService.saveMenu(authUser.getId(), authUser.getUserRole(), dto));
+        return ResponseEntity.ok(menuService.saveMenu(authUser.getId(), dto));
     }
 
     //전체 메뉴 조회
@@ -52,15 +55,17 @@ public class MenuController {
     }
 
     //메뉴 수정
+    @AuthPermission(role = UserRole.OWNER)
     @PatchMapping("/{menuId}")
     public ResponseEntity<MenuResponse> updateMenu(@Auth AuthUser authUser, @PathVariable Long menuId, @RequestBody MenuRequest dto) {
-        return ResponseEntity.ok(menuService.updateMenu(authUser.getId(), authUser.getUserRole(), menuId, dto));
+        return ResponseEntity.ok(menuService.updateMenu(authUser.getId(), menuId, dto));
     }
 
     //메뉴 삭제
+    @AuthPermission(role = UserRole.OWNER)
     @DeleteMapping("/{menuId}")
     public ResponseEntity<String> deleteMenu(@Auth AuthUser authUser, @PathVariable Long menuId) {
-        menuService.deleteMenu(authUser.getId(), authUser.getUserRole(), menuId);
+        menuService.deleteMenu(authUser.getId(), menuId);
         return ResponseEntity.ok("해당 메뉴를 삭제했습니다.");
     }
 }

@@ -6,7 +6,7 @@ import com.example.deliveryappproject.config.PasswordEncoder;
 import com.example.deliveryappproject.domain.auth.dto.request.AuthLoginRequest;
 import com.example.deliveryappproject.domain.auth.dto.response.AuthTokenResponse;
 import com.example.deliveryappproject.domain.user.entity.User;
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

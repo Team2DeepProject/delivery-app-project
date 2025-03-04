@@ -34,13 +34,9 @@ public class MenuService {
 
     //메뉴 생성
     @Transactional
-    public MenuResponse saveMenu(Long id, UserRole userRole, MenuRequest dto) {
+    public MenuResponse saveMenu(Long id, MenuRequest dto) {
         User user = userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Not Found UserId"));
-
-        if (UserRole.OWNER != userRole) {
-            throw new UnauthorizedException("사장님만 메뉴를 생성할 수 있습니다.");
-        }
 
         if (menuRepository.existsByMenuNameAndStoreId(dto.getMenuName(), dto.getStoreId())) {
             throw new BadRequestException("동일메뉴는 불가능합니다.");
@@ -114,13 +110,9 @@ public class MenuService {
 
     //메뉴수정
     @Transactional
-    public MenuResponse updateMenu(Long userId, UserRole userRole, Long menuId, MenuRequest dto) {
+    public MenuResponse updateMenu(Long userId, Long menuId, MenuRequest dto) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Not Found userId"));
-
-        if (UserRole.OWNER != userRole) {
-            throw new UnauthorizedException("사장님만 메뉴를 수정할 수 있습니다.");
-        }
 
         Menu menu = menuRepository.findById(menuId).orElseThrow(
                 () -> new NotFoundException("Not Found menu"));
@@ -139,13 +131,9 @@ public class MenuService {
 
     //메뉴 삭제(상태 변경만)
     @Transactional
-    public void deleteMenu(Long userId, UserRole userRole, Long menuId) {
+    public void deleteMenu(Long userId, Long menuId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Not Found userId"));
-
-        if (UserRole.OWNER != userRole) {
-            throw new NotFoundException("사장님만 메뉴를 삭제할 수 있습니다.");
-        }
 
         Menu menu = menuRepository.findById(menuId).orElseThrow(
                 () -> new NotFoundException("Not Found Menu"));
