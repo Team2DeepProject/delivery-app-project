@@ -228,8 +228,8 @@ public class MenuServiceTest {
         // then
         assertEquals("menuName2", menu.getMenuName());
         assertEquals("information2", menu.getInformation());
-        }
 
+        }
 
     @Test
     void 메뉴_삭제_테스트() {

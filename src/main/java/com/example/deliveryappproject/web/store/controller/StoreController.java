@@ -4,7 +4,7 @@ import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.response.Response;
-import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
+import com.example.deliveryappproject.domain.menu.dto.response.MenuResponse;
 import com.example.deliveryappproject.domain.store.dto.request.StoreCreateRequest;
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;

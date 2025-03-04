@@ -136,7 +136,6 @@ public class UserServiceTest {
         UserDeleteRequest request = new UserDeleteRequest("123!@#abcde");
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
 
-
         passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         //when
