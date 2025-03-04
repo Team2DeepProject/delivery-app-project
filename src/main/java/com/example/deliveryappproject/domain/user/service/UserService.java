@@ -57,4 +57,9 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(
                 () -> new BadRequestException("Not Found UserId"));
     }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new BadRequestException("Not Found UserId"));
+    }
 }
