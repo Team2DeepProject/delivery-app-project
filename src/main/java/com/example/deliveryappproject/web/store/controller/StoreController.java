@@ -55,20 +55,22 @@ public class StoreController {
 
     @AuthPermission(role = UserRole.OWNER)
     @PatchMapping("/{storeId}")
-    public void updateStore(
+    public Response<Void> updateStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestBody StoreUpdateRequest storeUpdateRequest
     ) {
         storeService.updateStore(authUser, storeId, storeUpdateRequest);
+        return Response.empty();
     }
 
     @AuthPermission(role = UserRole.OWNER)
     @DeleteMapping("/{storeId}")
-    public void deleteStore(
+    public Response<Void> deleteStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId
     ) {
         storeService.deleteStore(authUser, storeId);
+        return Response.empty();
     }
 }
