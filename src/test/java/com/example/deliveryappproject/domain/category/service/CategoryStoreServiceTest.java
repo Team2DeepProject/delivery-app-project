@@ -3,6 +3,7 @@ package com.example.deliveryappproject.domain.category.service;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
+import com.example.deliveryappproject.domain.category.dto.response.CategoryStoreResponse;
 import com.example.deliveryappproject.domain.category.entity.Category;
 import com.example.deliveryappproject.domain.category.entity.CategoryStore;
 import com.example.deliveryappproject.domain.category.repository.CategoryStoreRepository;
@@ -157,12 +158,12 @@ public class CategoryStoreServiceTest {
         given(categoryStoreRepository.findByCategoryId(categoryId, pageable)).willReturn(categoryStorePage);
 
         // when
-        Page<StoreGetAllResponse> result = categoryStoreService.getCategoryStore(categoryId, page, size);
+        CategoryStoreResponse categoryStore = categoryStoreService.getCategoryStore(categoryId, page, size);
 
         // then
-        assertEquals(2, result.getTotalElements());
-        assertEquals(store1.getId(), result.getContent().get(0).getId());
-        assertEquals(store2.getId(), result.getContent().get(1).getId());
+        assertEquals(2, categoryStore.getCategoryStores().size());
+        assertEquals(store1.getStoreName(), categoryStore.getCategoryStores().get(0).getStoreName());
+        assertEquals(store2.getStoreName(), categoryStore.getCategoryStores().get(1).getStoreName());
 
         verify(categoryStoreRepository, times(1)).findByCategoryId(categoryId, pageable);
     }

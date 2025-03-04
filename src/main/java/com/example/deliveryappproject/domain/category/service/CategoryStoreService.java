@@ -3,6 +3,9 @@ package com.example.deliveryappproject.domain.category.service;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
+import com.example.deliveryappproject.domain.bookmark.service.BookmarkCountService;
+import com.example.deliveryappproject.domain.bookmark.service.BookmarkService;
+import com.example.deliveryappproject.domain.category.dto.response.CategoryStoreResponse;
 import com.example.deliveryappproject.domain.category.entity.Category;
 import com.example.deliveryappproject.domain.category.entity.CategoryStore;
 import com.example.deliveryappproject.domain.category.repository.CategoryStoreRepository;
@@ -17,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -26,6 +30,7 @@ public class CategoryStoreService {
     private final StoreService storeService;
     private final CategoryService categoryService;
     private final CategoryStoreRepository categoryStoreRepository;
+    private final BookmarkCountService bookmarkCountService;
 
     @Transactional
     public void createCategoryStore(AuthUser authUser, Long storeId, Long categoryId) {
@@ -57,12 +62,20 @@ public class CategoryStoreService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StoreGetAllResponse> getCategoryStore(Long categoryId, int page, int size) {
+    public CategoryStoreResponse getCategoryStore(Long categoryId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-
         Page<CategoryStore> categoryStorePage = categoryStoreRepository.findByCategoryId(categoryId, pageable);
 
-        return categoryStorePage.map( categoryStore -> StoreGetAllResponse.fromDto(categoryStore.getStore()));
+        String categoryName = categoryStorePage.isEmpty() ? "" : categoryStorePage.getContent().get(0).getCategory().getName();
+
+        List<StoreGetAllResponse> storeList = categoryStorePage.getContent().stream()
+                .map(categoryStore -> {
+                    int bookmarkCount = bookmarkCountService.findByStoreId(categoryStore.getStore().getId()).size();
+                    return StoreGetAllResponse.fromDto(categoryStore.getStore(), bookmarkCount);
+                })
+                .toList();
+
+        return CategoryStoreResponse.fromDto(categoryName, storeList);
     }
 
     private CategoryStore findByStoreAndCategoryOrElseThrow(Long categoryId, Long storeId) {

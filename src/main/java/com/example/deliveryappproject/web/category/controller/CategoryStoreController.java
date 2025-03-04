@@ -4,6 +4,7 @@ import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.response.Response;
+import com.example.deliveryappproject.domain.category.dto.response.CategoryStoreResponse;
 import com.example.deliveryappproject.domain.category.service.CategoryStoreService;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
@@ -40,11 +41,11 @@ public class CategoryStoreController {
     }
 
     @GetMapping("/categorys/{categoryId}")
-    public Response<StoreGetAllResponse> getCategoryStore(
+    public Response<CategoryStoreResponse> getCategoryStore(
             @PathVariable Long categoryId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return Response.fromPage(categoryStoreService.getCategoryStore(categoryId, page, size));
+        return Response.of(categoryStoreService.getCategoryStore(categoryId, page, size));
     }
 }
