@@ -1,23 +1,17 @@
 package com.example.deliveryappproject.domain.store.dto.response;
 
 import com.example.deliveryappproject.domain.store.entity.Store;
-import com.example.deliveryappproject.domain.store.entity.StoreState;
-import com.example.deliveryappproject.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.math.BigDecimal;
 import java.time.LocalTime;
-
-import static jakarta.persistence.EnumType.STRING;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class StoreGetAllResponse {
+public class StoreGetResponse<T> {
 
     private final String storeName;
 
@@ -31,14 +25,16 @@ public class StoreGetAllResponse {
 
     private final int minOrderPrice;
 
-    public static StoreGetAllResponse fromDto(Store store, int bookmarkCount) {
-        return StoreGetAllResponse.builder()
+    private final T menu;
+
+    public static <T> StoreGetResponse<T> fromDto(Store store, int bookmarkCount, T menu) {
+        return StoreGetResponse.<T>builder()
                 .storeName(store.getStoreName())
                 .openAt(store.getOpenAt())
                 .closeAt(store.getCloseAt())
                 .bookmarkCount(bookmarkCount)
                 .minOrderPrice(store.getMinOrderPrice().intValue())
+                .menu(menu)
                 .build();
     }
-
 }
