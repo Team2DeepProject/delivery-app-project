@@ -3,7 +3,7 @@ package com.example.deliveryappproject.config.argument;
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
