@@ -1,8 +1,8 @@
-package com.example.deliveryappproject.domain.notice.service;
+package com.example.deliveryappproject.domain.storenotice.service;
 
-import com.example.deliveryappproject.domain.notice.dto.response.NoticeResponseDto;
-import com.example.deliveryappproject.domain.notice.entity.Notice;
-import com.example.deliveryappproject.domain.notice.repository.NoticeRepository;
+import com.example.deliveryappproject.domain.storenotice.dto.response.NoticeResponseDto;
+import com.example.deliveryappproject.domain.storenotice.entity.Notice;
+import com.example.deliveryappproject.domain.storenotice.repository.NoticeRepository;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

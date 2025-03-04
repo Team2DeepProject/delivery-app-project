@@ -1,11 +1,11 @@
-package com.example.deliveryappproject.domain.notice.controller;
+package com.example.deliveryappproject.web.storenotice.controller;
 
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
-import com.example.deliveryappproject.domain.notice.dto.request.NoticeRequestDto;
-import com.example.deliveryappproject.domain.notice.dto.response.NoticeResponseDto;
-import com.example.deliveryappproject.domain.notice.service.NoticeService;
+import com.example.deliveryappproject.domain.storenotice.dto.request.NoticeRequestDto;
+import com.example.deliveryappproject.domain.storenotice.dto.response.NoticeResponseDto;
+import com.example.deliveryappproject.domain.storenotice.service.NoticeService;
 import com.example.deliveryappproject.common.response.Response;
 import com.example.deliveryappproject.domain.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;

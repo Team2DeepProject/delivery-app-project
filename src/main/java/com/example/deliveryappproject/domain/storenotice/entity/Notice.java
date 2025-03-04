@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.domain.notice.entity;
+package com.example.deliveryappproject.domain.storenotice.entity;
 
 import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.store.entity.Store;
