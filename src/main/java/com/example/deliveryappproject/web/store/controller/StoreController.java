@@ -3,9 +3,12 @@ package com.example.deliveryappproject.web.store.controller;
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
+import com.example.deliveryappproject.common.response.Response;
+import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
 import com.example.deliveryappproject.domain.store.dto.request.StoreCreateRequest;
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
+import com.example.deliveryappproject.domain.store.dto.response.StoreGetResponse;
 import com.example.deliveryappproject.domain.store.service.StoreService;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
 import jakarta.validation.Valid;
@@ -20,26 +23,35 @@ public class StoreController {
 
     private final StoreService storeService;
 
+    /* 가게 작성 */
     @AuthPermission(role = UserRole.OWNER)
     @PostMapping
-    public void createStore(
+    public Response<Void> createStore(
             @Auth AuthUser authUser,
             @Valid @RequestBody StoreCreateRequest storeCreateRequest
     ) {
         storeService.createStore(authUser, storeCreateRequest);
+        return Response.empty();
     }
 
+    /* 가게 다건 조회 */
     @GetMapping
-    public Page<StoreGetAllResponse> getAllStore(
+    public Response<StoreGetAllResponse> getAllStore(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return storeService.getAllStore(page, size);
+        return Response.fromPage(storeService.getAllStore(page, size));
     }
 
-    /*
-    TODO: 메뉴 구현 이후 가게 단건 구현 예정
-     */
+    /* 가게 단건 조회 */
+    @GetMapping("/{storeId}")
+    public Response<StoreGetResponse<Page<MenuResponse>>> getStore(
+            @PathVariable Long storeId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return Response.of(storeService.getStore(storeId, page, size));
+    }
 
     @AuthPermission(role = UserRole.OWNER)
     @PatchMapping("/{storeId}")
