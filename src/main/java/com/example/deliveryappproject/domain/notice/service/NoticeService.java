@@ -17,18 +17,6 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final StoreRepository storeRepository;
 
-    private Notice findNoticeById(Long noticeId) {
-        return noticeRepository.findById(noticeId).orElseThrow(
-                () -> new RuntimeException("공지 확인 불가: " + noticeId)
-        );
-    }
-
-    private void validateStoreExists(Long storeId) {
-        if (!storeRepository.existsById(storeId)) {
-            throw new RuntimeException("가게 확인 불가: " + storeId);
-        }
-    }
-
     // 공지 생성
     @Transactional
     public Long createNotice(Long storeId, String title, String contents) {
@@ -65,5 +53,17 @@ public class NoticeService {
     public void deleteNotice(Long noticeId, Long id) {
         Notice notice = findNoticeById(noticeId);
         noticeRepository.delete(notice);
+    }
+
+    private Notice findNoticeById(Long noticeId) {
+        return noticeRepository.findById(noticeId).orElseThrow(
+                () -> new RuntimeException("공지 확인 불가: " + noticeId)
+        );
+    }
+
+    private void validateStoreExists(Long storeId) {
+        if (!storeRepository.existsById(storeId)) {
+            throw new RuntimeException("가게 확인 불가: " + storeId);
+        }
     }
 }
