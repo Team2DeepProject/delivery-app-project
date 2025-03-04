@@ -3,6 +3,9 @@ package com.example.deliveryappproject.domain.category.service;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
+import com.example.deliveryappproject.domain.bookmark.entity.Bookmark;
+import com.example.deliveryappproject.domain.bookmark.service.BookmarkCountService;
+import com.example.deliveryappproject.domain.bookmark.service.BookmarkService;
 import com.example.deliveryappproject.domain.category.dto.response.CategoryStoreResponse;
 import com.example.deliveryappproject.domain.category.entity.Category;
 import com.example.deliveryappproject.domain.category.entity.CategoryStore;
@@ -25,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +48,9 @@ public class CategoryStoreServiceTest {
 
     @Mock
     private CategoryStoreRepository categoryStoreRepository;
+
+    @Mock
+    private BookmarkCountService bookmarkCountService;
 
     @InjectMocks
     private CategoryStoreService categoryStoreService;
@@ -146,16 +153,21 @@ public class CategoryStoreServiceTest {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
+        String categoryName = "한식";
+
         Store store1 = new Store(new User(1L), "store1", LocalTime.of(8, 0), LocalTime.of(20, 0), BigDecimal.valueOf(15000));
         Store store2 = new Store(new User(2L), "store2", LocalTime.of(8, 0), LocalTime.of(20, 0), BigDecimal.valueOf(15000));
 
-        CategoryStore categoryStore1 = new CategoryStore(store1.getUser(), new Category(categoryId), store1);
-        CategoryStore categoryStore2 = new CategoryStore(store2.getUser(), new Category(categoryId), store2);
+        Category category = new Category(categoryId, new User(1L), categoryName);
+        CategoryStore categoryStore1 = new CategoryStore(store1.getUser(), category, store1);
+        CategoryStore categoryStore2 = new CategoryStore(store2.getUser(), category, store2);
 
         List<CategoryStore> categoryStores = List.of(categoryStore1, categoryStore2);
         Page<CategoryStore> categoryStorePage = new PageImpl<>(categoryStores);
 
         given(categoryStoreRepository.findByCategoryId(categoryId, pageable)).willReturn(categoryStorePage);
+        given(bookmarkCountService.findByStoreId(store1.getId())).willReturn(Collections.nCopies(10, new Bookmark(new User(1L), store1)));
+        given(bookmarkCountService.findByStoreId(store2.getId())).willReturn(Collections.nCopies(5, new Bookmark(new User(1L), store2)));
 
         // when
         CategoryStoreResponse categoryStore = categoryStoreService.getCategoryStore(categoryId, page, size);
@@ -167,4 +179,27 @@ public class CategoryStoreServiceTest {
 
         verify(categoryStoreRepository, times(1)).findByCategoryId(categoryId, pageable);
     }
+
+    @Test
+    void 카테고리가게조회_빈결과_조회_성공() {
+        // given
+        Long categoryId = 1L;
+        int page = 1;
+        int size = 10;
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<CategoryStore> emptyPage = Page.empty();
+        given(categoryStoreRepository.findByCategoryId(categoryId, pageable)).willReturn(emptyPage);
+
+        // when
+        CategoryStoreResponse categoryStore = categoryStoreService.getCategoryStore(categoryId, page, size);
+
+        // then
+        assertEquals("", categoryStore.getCategoryName());
+        assertTrue(categoryStore.getCategoryStores().isEmpty());
+
+        verify(categoryStoreRepository, times(1)).findByCategoryId(categoryId, pageable);
+    }
+
 }
