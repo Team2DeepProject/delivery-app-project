@@ -6,6 +6,7 @@ import com.example.deliveryappproject.config.JwtUtil;
 import com.example.deliveryappproject.domain.auth.entity.RefreshToken;
 import com.example.deliveryappproject.domain.auth.repository.RefreshTokenRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +77,7 @@ public class TokenServiceTest {
         Long userId = 1L;
         RefreshToken mockRefreshToken = mock(RefreshToken.class);
 
-        given(refreshTokenRepository.findById(userId)).willReturn(Optional.of(mockRefreshToken));
+        given(refreshTokenRepository.findById(anyLong())).willReturn(Optional.of(mockRefreshToken));
 
         // when
         tokenService.revokeRefreshToken(userId);
@@ -91,7 +92,7 @@ public class TokenServiceTest {
         // given
         Long userId = 1L;
 
-        given(refreshTokenRepository.findById(userId)).willReturn(Optional.empty());
+        given(refreshTokenRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
         assertThrows(NotFoundException.class,
@@ -109,7 +110,7 @@ public class TokenServiceTest {
 
         RefreshToken mockRefreshToken = mock(RefreshToken.class);
 
-        given(refreshTokenRepository.findByToken(refreshToken)).willReturn(Optional.of(mockRefreshToken));
+        given(refreshTokenRepository.findByToken(any(String.class))).willReturn(Optional.of(mockRefreshToken));
         given(userService.findUserByIdOrElseThrow(mockRefreshToken.getUserId())).willReturn(mockUser);
 
         // when
@@ -127,7 +128,7 @@ public class TokenServiceTest {
 
         RefreshToken mockRefreshToken = mock(RefreshToken.class);
 
-        given(refreshTokenRepository.findByToken(refreshToken)).willReturn(Optional.of(mockRefreshToken));
+        given(refreshTokenRepository.findByToken(any(String.class))).willReturn(Optional.of(mockRefreshToken));
         given(mockRefreshToken.getTokenStatus()).willReturn(INVALIDATED);
 
         // when & then
@@ -141,7 +142,7 @@ public class TokenServiceTest {
         //given
         String refreshToken = "refresh-token";
 
-        given(refreshTokenRepository.findByToken(refreshToken)).willReturn(Optional.empty());
+        given(refreshTokenRepository.findByToken(any(String.class))).willReturn(Optional.empty());
 
         // when & then
         assertThrows(NotFoundException.class,
