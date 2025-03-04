@@ -3,7 +3,7 @@ package com.example.deliveryappproject.domain.store.entity;
 import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,6 +37,7 @@ public class Store extends Timestamped {
 
     private BigDecimal minOrderPrice;
 
+    @Builder
     public Store(User user, String storeName, LocalTime openAt, LocalTime closeAt, BigDecimal minOrderPrice) {
         this.user = user;
         this.storeName = storeName;
@@ -56,4 +57,5 @@ public class Store extends Timestamped {
         this.closeAt = closeAt;
         this.minOrderPrice = minOrderPrice;
     }
+
 }

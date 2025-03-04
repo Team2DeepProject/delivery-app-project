@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.domain.user.entity;
+package com.example.deliveryappproject.domain.user.enums;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
 

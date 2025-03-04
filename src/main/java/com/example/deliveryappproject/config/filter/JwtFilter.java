@@ -1,6 +1,9 @@
 package com.example.deliveryappproject.config.filter;
 
+import com.example.deliveryappproject.common.exception.ErrorCode;
+import com.example.deliveryappproject.common.response.ErrorResponse;
 import com.example.deliveryappproject.config.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -45,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 유저정보 유무 확인 + filter 는 공통 예외처리 불가
             if (claims == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
+                handleException(response, ErrorCode.BAD_REQUEST, "잘못된 JWT 토큰입니다.");
                 return;
             }
 
@@ -56,16 +59,25 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명입니다.");
+            handleException(response, ErrorCode.AUTHORIZATION, "유효하지 않는 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token, 만료된 JWT token 입니다.", e);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT 토큰입니다.");
+            handleException(response, ErrorCode.AUTHORIZATION, "만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
+            handleException(response, ErrorCode.AUTHORIZATION, "지원되지 않는 JWT 토큰입니다.");
         } catch (Exception e) {
             log.error("Invalid JWT token, 유효하지 않는 JWT 토큰 입니다.", e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "유효하지 않는 JWT 토큰입니다.");
+            handleException(response, ErrorCode.AUTHORIZATION, "유효하지 않는 JWT 토큰입니다.");
         }
+    }
+
+    private void handleException(HttpServletResponse response, ErrorCode errorCode, String message) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(errorCode.getStatus().value());
+        response.setCharacterEncoding("UTF-8");
+
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode.getCode(), message);
+        response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
     }
 }

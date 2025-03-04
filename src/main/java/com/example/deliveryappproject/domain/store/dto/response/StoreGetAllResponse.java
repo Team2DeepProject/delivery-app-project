@@ -6,6 +6,7 @@ import com.example.deliveryappproject.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.time.LocalTime;
 import static jakarta.persistence.EnumType.STRING;
 
 @Getter
+@Builder
 @AllArgsConstructor
 public class StoreGetAllResponse {
 
@@ -30,14 +32,16 @@ public class StoreGetAllResponse {
 
     private final int minOrderPrice;
 
-    public StoreGetAllResponse(Store store) {
-        this.id = store.getId();
-        this.userName = store.getUser().getUserName();
-        this.storeName = store.getStoreName();
-        this.storeState = store.getStoreState().name();
-        this.openAt = store.getOpenAt();
-        this.closeAt = store.getCloseAt();
-        this.minOrderPrice = store.getMinOrderPrice().intValue();
+    public static StoreGetAllResponse fromDto(Store store) {
+        return StoreGetAllResponse.builder()
+                .id(store.getId())
+                .userName(store.getUser().getUserName())
+                .storeName(store.getStoreName())
+                .storeState(store.getStoreState().name())
+                .openAt(store.getOpenAt())
+                .closeAt(store.getCloseAt())
+                .minOrderPrice(store.getMinOrderPrice().intValue())
+                .build();
     }
 
 }
