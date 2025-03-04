@@ -7,7 +7,7 @@ import com.example.deliveryappproject.domain.store.dto.request.StoreCreateReques
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
 import com.example.deliveryappproject.domain.store.service.StoreService;
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
