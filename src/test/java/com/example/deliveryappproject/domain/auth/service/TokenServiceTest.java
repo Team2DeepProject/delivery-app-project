@@ -1,11 +1,10 @@
-package com.example.deliveryappproject.domain.auth;
+package com.example.deliveryappproject.domain.auth.service;
 
 import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
 import com.example.deliveryappproject.config.JwtUtil;
 import com.example.deliveryappproject.domain.auth.entity.RefreshToken;
 import com.example.deliveryappproject.domain.auth.repository.RefreshTokenRepository;
-import com.example.deliveryappproject.domain.auth.service.TokenService;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import org.junit.jupiter.api.Test;

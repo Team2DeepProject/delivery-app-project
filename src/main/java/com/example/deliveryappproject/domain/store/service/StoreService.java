@@ -3,6 +3,7 @@ package com.example.deliveryappproject.domain.store.service;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
+import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.domain.store.dto.request.StoreCreateRequest;
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
 import com.example.deliveryappproject.domain.store.dto.response.StoreGetAllResponse;
@@ -84,7 +85,7 @@ public class StoreService {
 
     public Store findStoreByIdOrElseThrow(Long id) {
         return storeRepository.findById(id).orElseThrow(
-                () -> new BadRequestException("Not Found Store")
+                () -> new NotFoundException("Not Found Store")
         );
     }
 }
