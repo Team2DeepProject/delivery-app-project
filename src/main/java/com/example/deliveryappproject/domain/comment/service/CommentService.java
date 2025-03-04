@@ -76,8 +76,10 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException("댓글을 찾을 수 없습니다."));
 
-        comment.updateContent(request.getContent()); // 댓글 내용 수정
-        return new CommentResponse(comment);
+        comment.updateContent(request.getContent());
+        Comment updatedComment = commentRepository.save(comment);  // 수정된 댓글 저장
+
+        return new CommentResponse(updatedComment);  // 수정된 댓글 반환
     }
 
     // 댓글 삭제

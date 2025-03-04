@@ -48,8 +48,8 @@ public class CommentController {
             @PathVariable Long commentId,
             @Valid @RequestBody CommentRequest request
     ) {
-        commentService.updateComment(commentId, request);
-        return ResponseEntity.ok().build();
+        CommentResponse updatedComment = commentService.updateComment(commentId, request);  // 댓글 수정
+        return ResponseEntity.ok(updatedComment);
     }
 
     // 댓글 삭제
