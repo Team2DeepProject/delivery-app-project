@@ -36,7 +36,7 @@ public class TokenServiceTest {
 
     /* createAccessToken */
     @Test
-    void createAccessToken에서_정상적으로_AccessToken을_생성할_수_있는가() {
+    void 토큰발급_AccessToken_발급_성공() {
         // given
         Long userId = 1L;
         String accessToken = "access-token";
@@ -54,7 +54,7 @@ public class TokenServiceTest {
 
     /* createRefreshToken */
     @Test
-    void createRefreshToken에서_정상적으로_RefreshToken을_생성할_수_있는가() {
+    void 토큰발급_RefreshToken_발급_성공() {
         // given
         Long userId = 1L;
         User user = new User(userId);
@@ -72,7 +72,7 @@ public class TokenServiceTest {
 
     /* revokeRefreshToken */
     @Test
-    void revokeRefreshToken에_정상적으로_RefreshToken을_만료할_수_있는가() {
+    void 토큰만료_성공() {
         // given
         Long userId = 1L;
         RefreshToken mockRefreshToken = mock(RefreshToken.class);
@@ -88,7 +88,7 @@ public class TokenServiceTest {
     }
 
     @Test
-    void revokeRefreshToken에_토큰을_찾지_못할_시_NotFoundException를_던지는가() {
+    void 토큰만료_토큰을_찾지_못할시_실패() {
         // given
         Long userId = 1L;
 
@@ -102,7 +102,7 @@ public class TokenServiceTest {
 
     /* reissueToken */
     @Test
-    void reissueToken에서_정상적으로_토큰의_유효성을_검사할_수_있는가() {
+    void 토큰유효성검사_성공() {
         // given
         Long userId = 1L;
         User mockUser = new User(userId);
@@ -122,7 +122,7 @@ public class TokenServiceTest {
     }
 
     @Test
-    void reissueToken에서_토큰이_비활성_상태일_경우_UnauthorizedException을_던지는가() {
+    void 토큰유효성검사_비활성_상태일때_실패() {
         // given
         String refreshToken = "refresh-token";
 
@@ -138,7 +138,7 @@ public class TokenServiceTest {
     }
 
     @Test
-    void findByTokenOrElseThrow에서_토큰이_없을_시_NotFoundException를_던지는가() {
+    void 토큰검색_토큰이_없을_시_실패() {
         //given
         String refreshToken = "refresh-token";
 

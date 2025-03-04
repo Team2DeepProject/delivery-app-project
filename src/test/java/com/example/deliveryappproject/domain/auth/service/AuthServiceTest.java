@@ -35,7 +35,7 @@ public class AuthServiceTest {
 
     /* login */
     @Test
-    void signin에서_성공적으로_로그인을_할_수_있는가() {
+    void 로그인_성공() {
         // given
         String email = "test@example.com";
         String password = "password123";
@@ -61,7 +61,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void login에서_비밀번호가_일치하지_않을_떄_UnauthorizedException를_출력할_수_있는가() {
+    void 로그인_비밀번호가_일치하지_않을시_실패() {
         //given
         String email = "test@example.com";
         String wrongPassword = "password123";
@@ -81,7 +81,7 @@ public class AuthServiceTest {
 
     /* logout */
     @Test
-    void logout에서_성공적으로_로그아웃을_할_수_있는가() {
+    void 로그아웃_성공() {
         // given
         Long userId = 1L;
         AuthUser authUser = new AuthUser(userId, "test@example.com", UserRole.USER);
@@ -95,7 +95,7 @@ public class AuthServiceTest {
 
     /* reissueAccessToken */
     @Test
-    void reissueAccessToken에서_정상적으로_토큰을_발급받을_수_있는가() {
+    void 토큰재발급_성공() {
         // given
         Long userId = 1L;
         String refreshToken = "refresh-token";
