@@ -2,6 +2,7 @@ package com.example.deliveryappproject.config;
 
 import com.example.deliveryappproject.config.argument.AuthUserArgumentResolver;
 import com.example.deliveryappproject.config.argument.RefreshTokenArgumentResolver;
+import com.example.deliveryappproject.config.interceptor.AuthRoleInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -22,8 +23,8 @@ public class WebConfig implements WebMvcConfigurer {
     /* Interceptor 등록 */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-
-        // 커스텀한 어노테이션으로 인가 구분 구현 예정
-
+        registry.addInterceptor(new AuthRoleInterceptor())
+                .order(1)
+                .addPathPatterns("/**");
     }
 }

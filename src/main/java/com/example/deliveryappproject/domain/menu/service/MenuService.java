@@ -2,6 +2,7 @@ package com.example.deliveryappproject.domain.menu.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
+import com.example.deliveryappproject.common.exception.UnauthorizedException;
 import com.example.deliveryappproject.domain.menu.dto.MenuRequest;
 import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
 import com.example.deliveryappproject.domain.menu.entity.Menu;
@@ -38,11 +39,11 @@ public class MenuService {
                 new NotFoundException("Not Found UserId"));
 
         if (UserRole.OWNER != userRole) {
-            throw new NotFoundException("사장님만 메뉴를 생성할 수 있습니다.");
+            throw new UnauthorizedException("사장님만 메뉴를 생성할 수 있습니다.");
         }
 
         if (menuRepository.existsByMenuNameAndStoreId(dto.getMenuName(), dto.getStoreId())) {
-            throw new NotFoundException("동일메뉴는 불가능합니다.");
+            throw new BadRequestException("동일메뉴는 불가능합니다.");
         }
 
         Optional<Store> store = storeRepository.findById(dto.getStoreId());
@@ -118,8 +119,9 @@ public class MenuService {
                 () -> new NotFoundException("Not Found userId"));
 
         if (UserRole.OWNER != userRole) {
-            throw new NotFoundException("사장님만 메뉴를 수정할 수 있습니다.");
+            throw new UnauthorizedException("사장님만 메뉴를 수정할 수 있습니다.");
         }
+
         Menu menu = menuRepository.findById(menuId).orElseThrow(
                 () -> new NotFoundException("Not Found menu"));
 
