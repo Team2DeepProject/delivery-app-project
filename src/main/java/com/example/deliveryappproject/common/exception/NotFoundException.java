@@ -9,3 +9,4 @@ public class NotFoundException extends CustomException {
         super(ErrorCode.NOT_FOUND, message);
     }
 }
+
