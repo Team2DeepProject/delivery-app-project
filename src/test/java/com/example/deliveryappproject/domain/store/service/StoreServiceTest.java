@@ -4,6 +4,7 @@ import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
+import com.example.deliveryappproject.domain.bookmark.entity.Bookmark;
 import com.example.deliveryappproject.domain.bookmark.service.BookmarkCountService;
 import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
 import com.example.deliveryappproject.domain.menu.enums.MenuState;
@@ -30,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,13 +90,15 @@ public class StoreServiceTest {
         Store store1 = new Store(1L, "한식가게", LocalTime.of(8, 0), LocalTime.of(21, 0), BigDecimal.valueOf(20000));
         Store store2 = new Store(2L, "중식가게", LocalTime.of(10, 0), LocalTime.of(22, 0), BigDecimal.valueOf(15000));
 
+        int bookmarkCount1 = 10;
+        int bookmarkCount2 = 5;
         List<Store> stores = List.of(store1, store2);
         Page<Store> storePage = new PageImpl<>(stores);
 
         Pageable pageable = PageRequest.of(0, 10);
         given(storeRepository.findAllByOrderByModifiedAtDesc(pageable)).willReturn(storePage);
-        given(bookmarkCountService.getCountByStoreId(store1.getId())).willReturn(10);
-        given(bookmarkCountService.getCountByStoreId(store2.getId())).willReturn(5);
+        given(bookmarkCountService.findByStoreId(store1.getId())).willReturn(Collections.nCopies(bookmarkCount1, new Bookmark(new User(1L), store1)));
+        given(bookmarkCountService.findByStoreId(store2.getId())).willReturn(Collections.nCopies(bookmarkCount2, new Bookmark(new User(1L), store2)));
 
         // when
         Page<StoreGetAllResponse> result = storeService.getAllStore(1, 10);
@@ -102,13 +106,13 @@ public class StoreServiceTest {
         // when
         assertEquals(2, result.getTotalElements());
         assertEquals("한식가게", result.getContent().get(0).getStoreName());
-        assertEquals(10, result.getContent().get(0).getBookmarkCount());
+        assertEquals(bookmarkCount1, result.getContent().get(0).getBookmarkCount());
         assertEquals("중식가게", result.getContent().get(1).getStoreName());
-        assertEquals(5, result.getContent().get(1).getBookmarkCount());
+        assertEquals(bookmarkCount2, result.getContent().get(1).getBookmarkCount());
 
         verify(storeRepository, times(1)).findAllByOrderByModifiedAtDesc(pageable);
-        verify(bookmarkCountService, times(1)).getCountByStoreId(store1.getId());
-        verify(bookmarkCountService, times(1)).getCountByStoreId(store2.getId());
+        verify(bookmarkCountService, times(1)).findByStoreId(store1.getId());
+        verify(bookmarkCountService, times(1)).findByStoreId(store2.getId());
     }
 
     /* getStore */
@@ -127,7 +131,7 @@ public class StoreServiceTest {
         Page<MenuResponse> menuPage = new PageImpl<>(menus);
 
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
-        given(bookmarkCountService.getCountByStoreId(anyLong())).willReturn(bookmarkCount);
+        given(bookmarkCountService.findByStoreId(storeId)).willReturn(Collections.nCopies(bookmarkCount, new Bookmark(new User(1L), new Store()))); // List<Bookmark> 반환
         given(menuService.findByStoreId(anyInt(), anyInt(), anyLong())).willReturn(menuPage);
 
         // When
@@ -142,7 +146,7 @@ public class StoreServiceTest {
         assertEquals(menuPage, result.getMenu());
 
         verify(storeRepository, times(1)).findById(storeId);
-        verify(bookmarkCountService, times(1)).getCountByStoreId(storeId);
+        verify(bookmarkCountService, times(1)).findByStoreId(storeId);
         verify(menuService, times(1)).findByStoreId(page, size, storeId);
     }
 

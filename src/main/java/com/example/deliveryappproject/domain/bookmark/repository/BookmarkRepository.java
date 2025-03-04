@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
@@ -15,6 +16,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
     Page<Bookmark> findByUserId(Long userId, Pageable pageable);
 
-    @Query("SELECT COUNT(b) FROM Bookmark b WHERE b.store.id = :storeId")
-    int countByStoreId(@Param("storeId") Long storeId);
+    @Query("SELECT b FROM Bookmark b WHERE b.store.id = :storeId")
+    List<Bookmark> findByStoreId(@Param("storeId") Long storeId);
 }
