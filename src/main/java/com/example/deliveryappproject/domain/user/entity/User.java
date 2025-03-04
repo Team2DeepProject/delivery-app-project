@@ -57,4 +57,11 @@ public class User extends Timestamped { // Timestamped 추가
         this.userState=userState;
     }
 
+    public void usePoints(int usedPoints) {
+        this.point -= usedPoints;
+    }
+
+    public void addPoints(int earnedPoints) {
+        this.point += earnedPoints;
+    }
 }
