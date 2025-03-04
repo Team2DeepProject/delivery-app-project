@@ -1,7 +1,6 @@
 package com.example.deliveryappproject.domain.category.service;
 
 import com.example.deliveryappproject.common.dto.AuthUser;
-import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.domain.category.dto.request.CategoryCreateRequest;
@@ -10,7 +9,6 @@ import com.example.deliveryappproject.domain.category.entity.Category;
 import com.example.deliveryappproject.domain.category.repository.CategoryRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +25,7 @@ public class CategoryService {
     public void createCategory(AuthUser authUser, CategoryCreateRequest categoryCreateRequest) {
 
         User user = new User(authUser.getId());
-        Category category = categoryCreateRequest.toEntity(user);
+        Category category = CategoryCreateRequest.toEntity(user, categoryCreateRequest);
 
         categoryRepository.save(category);
     }

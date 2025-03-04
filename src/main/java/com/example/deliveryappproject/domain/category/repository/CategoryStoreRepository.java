@@ -1,7 +1,6 @@
 package com.example.deliveryappproject.domain.category.repository;
 
 import com.example.deliveryappproject.domain.category.entity.CategoryStore;
-import com.example.deliveryappproject.domain.store.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

@@ -14,10 +14,10 @@ public class CategoryCreateRequest {
     @Size(max = 10, message = "카테고리 명은 10자 이하로 입력해주세요.")
     private String name;
 
-    public Category toEntity(User user) {
-        return new Category(
-                user,
-                this.name
-        );
+    public static Category toEntity(User user, CategoryCreateRequest dto) {
+        return Category.builder()
+                .user(user)
+                .name(dto.getName())
+                .build();
     }
 }

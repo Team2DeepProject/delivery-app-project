@@ -3,6 +3,7 @@ package com.example.deliveryappproject.domain.category.entity;
 import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,13 +23,10 @@ public class Category extends Timestamped{
     @Column(unique = true)
     private String name;
 
+    @Builder
     public Category(User user, String name) {
         this.user = user;
         this.name = name;
-    }
-
-    public Category(Long id) {
-        this.id = id;
     }
 
     public void updateCategoryName(String name) {
