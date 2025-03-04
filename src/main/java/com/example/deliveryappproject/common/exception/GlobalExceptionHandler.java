@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of("VALIDATION_ERROR", errorMessage);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
         log.info("CustomException : {}", e.getMessage(), e);
         return new ResponseEntity<>(ErrorResponse.of(e.getErrorCode(), e.getMessage()), e.getStatus());

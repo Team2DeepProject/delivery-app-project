@@ -6,7 +6,7 @@ import com.example.deliveryappproject.config.PasswordEncoder;
 import com.example.deliveryappproject.domain.auth.dto.request.AuthLoginRequest;
 import com.example.deliveryappproject.domain.auth.dto.response.AuthTokenResponse;
 import com.example.deliveryappproject.domain.user.entity.User;
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
@@ -45,10 +46,10 @@ public class AuthServiceTest {
         User user = new User(email, encodedPassword, "nickname", UserRole.USER);
         AuthLoginRequest authLoginRequest = new AuthLoginRequest(email, password);
 
-        given(userService.findUserByEmailOrElseThrow(authLoginRequest.getEmail())).willReturn(user);
+        given(userService.findUserByEmailOrElseThrow(any(String.class))).willReturn(user);
         given(passwordEncoder.matches(authLoginRequest.getPassword(), user.getPassword())).willReturn(true);
-        given(tokenService.createAccessToken(user)).willReturn(accessToken);
-        given(tokenService.createRefreshToken(user)).willReturn(refreshToken);
+        given(tokenService.createAccessToken(any(User.class))).willReturn(accessToken);
+        given(tokenService.createRefreshToken(any(User.class))).willReturn(refreshToken);
 
         // when
         AuthTokenResponse response = authService.login(authLoginRequest);
@@ -69,7 +70,7 @@ public class AuthServiceTest {
         User user = new User(email, encodedPassword, "nickname", UserRole.USER);
         AuthLoginRequest authLoginRequest = new AuthLoginRequest(email, wrongPassword);
 
-        given(userService.findUserByEmailOrElseThrow(authLoginRequest.getEmail())).willReturn(user);
+        given(userService.findUserByEmailOrElseThrow(any(String.class))).willReturn(user);
         given(passwordEncoder.matches(authLoginRequest.getPassword(), user.getPassword())).willReturn(false);
 
         //when & then
@@ -103,9 +104,9 @@ public class AuthServiceTest {
 
         User user = new User(userId);
 
-        given(tokenService.reissueToken(refreshToken)).willReturn(user);
-        given(tokenService.createAccessToken(user)).willReturn(newAccessToken);
-        given(tokenService.createRefreshToken(user)).willReturn(newRefreshToken);
+        given(tokenService.reissueToken(any(String.class))).willReturn(user);
+        given(tokenService.createAccessToken(any(User.class))).willReturn(newAccessToken);
+        given(tokenService.createRefreshToken(any(User.class))).willReturn(newRefreshToken);
 
         // when
         AuthTokenResponse response = authService.reissueAccessToken(refreshToken);
