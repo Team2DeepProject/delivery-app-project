@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.deliveryappproject.domain.cart.util.RedisKeyUtil.ITEM_PREFIX;
 import static com.example.deliveryappproject.domain.cart.util.RedisKeyUtil.STORE_ID_KEY;
 import static com.example.deliveryappproject.domain.cart.util.RedisKeyUtil.extractItemId;
 import static com.example.deliveryappproject.domain.cart.util.RedisKeyUtil.getCartKey;
@@ -46,6 +47,7 @@ public class CartRepository {
             return List.of();
         }
         return entries.entrySet().stream()
+                .filter(entry-> entry.getKey().startsWith(ITEM_PREFIX))
                 .map(this::convertToCartItem)
                 .toList();
     }

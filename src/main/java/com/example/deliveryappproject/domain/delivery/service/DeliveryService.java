@@ -1,6 +1,7 @@
 package com.example.deliveryappproject.domain.delivery.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
+import com.example.deliveryappproject.domain.delivery.dto.DeliveryResponse;
 import com.example.deliveryappproject.domain.delivery.entity.Delivery;
 import com.example.deliveryappproject.domain.delivery.entity.DeliveryStatus;
 import com.example.deliveryappproject.domain.delivery.repository.DeliveryRepository;
@@ -27,7 +28,7 @@ public class DeliveryService {
     }
 
     @Transactional
-    public void completeDelivery(Long deliveryId) {
+    public DeliveryResponse completeDelivery(Long deliveryId) {
 
         Delivery delivery = deliveryRepository.findById(deliveryId).orElseThrow(() -> new BadRequestException("delivery not found"));
         if (delivery.getDeliveryStatus() != DeliveryStatus.READY) {
@@ -43,6 +44,8 @@ public class DeliveryService {
         }
 
         order.completeOrder();
+
+        return DeliveryResponse.of(order.getId(),order.getStore().getId(), order.getOrderStatus());
 
     }
 }

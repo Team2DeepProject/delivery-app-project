@@ -18,11 +18,15 @@ import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.repository.UserRepository;
+import com.example.deliveryappproject.domain.user.userpoint.PointHistoryRepository;
+import com.example.deliveryappproject.domain.user.userpoint.entity.PointHistory;
+import com.example.deliveryappproject.domain.user.userpoint.entity.PointType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +42,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final PointPolicy pointPolicy;
     private final DeliveryRepository deliveryRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
 
     @Transactional
@@ -52,6 +57,9 @@ public class OrderService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BadRequestException("store Not Found"));
 
+//        if (!store.isOrderAvailable()) {
+//            throw new BadRequestException("주문 가능한 시간이 아닙니다.");
+//        }
 
         //최소 주문 금액 검증
         List<CartItem> items = cartRepository.findItems(userId);
@@ -86,7 +94,7 @@ public class OrderService {
         cartRepository.clear(userId);
 
 
-        return OrderResponse.of(order.getId(),order.getOrderStatus());
+        return OrderResponse.of(order.getId(),storeId, order.getOrderStatus());
 
         // ✅ 최소 주문 금액 검증
 
@@ -94,7 +102,7 @@ public class OrderService {
 
 
     @Transactional
-    public void acceptOrder(Long userId, Long orderId) {
+    public OrderResponse acceptOrder(Long userId, Long orderId) {
         Order order = orderRepository.findByIdWithOrderItems(orderId).orElseThrow(() -> new BadRequestException("order not found"));
 
         if (order.getOrderStatus() != OrderStatus.PENDING) {
@@ -103,26 +111,30 @@ public class OrderService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("User not found"));
 
-        //TODO 포인트 히스토리 추가
         if (order.getUsedPoints() > 0) {
             if(user.getPoint() < order.getUsedPoints()){
                 throw new BadRequestException("포인트가 부족합니다.");
             }
             user.usePoints(order.getUsedPoints());
+            pointHistoryRepository.save(new PointHistory(user, PointType.USE, order.getUsedPoints(),order.getId()));
 
         }else{
             int calculateEarnedPoints = pointPolicy.calculateEarnedPoints(order.getTotalPrice());
             user.addPoints(calculateEarnedPoints);
+            pointHistoryRepository.save(new PointHistory(user, PointType.EARN, calculateEarnedPoints,order.getId()));
+
         }
         order.acceptOrder();
 
         Delivery delivery = new Delivery(order);
         deliveryRepository.save(delivery);
 
+        return OrderResponse.of(order.getId(),order.getStore().getId(), order.getOrderStatus());
+
     }
 
     @Transactional
-    public void rejectOrder(Long orderId) {
+    public OrderResponse rejectOrder(Long orderId) {
         Order order = orderRepository.findByIdWithOrderItems(orderId).orElseThrow(() -> new BadRequestException("order not found"));
 
         if (order.getOrderStatus() != OrderStatus.PENDING) {
@@ -130,10 +142,12 @@ public class OrderService {
         }
 
         order.rejectOrder();
+
+        return OrderResponse.of(order.getId(),order.getStore().getId(), order.getOrderStatus());
     }
 
     @Transactional
-    public void cancelOrder(Long userId, Long orderId) {
+    public OrderResponse cancelOrder(Long userId, Long orderId) {
         Order order = orderRepository.findByIdWithOrderItems(orderId).orElseThrow(() -> new BadRequestException("order not found"));
 
         if (order.getOrderStatus() != OrderStatus.PENDING) {
@@ -145,6 +159,8 @@ public class OrderService {
         }
 
         order.cancelOrder();
+
+        return OrderResponse.of(order.getId(),order.getStore().getId(), order.getOrderStatus());
 
 
     }

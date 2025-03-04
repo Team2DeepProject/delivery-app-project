@@ -1,5 +1,8 @@
 package com.example.deliveryappproject.web.delivery;
 
+import com.example.deliveryappproject.common.response.Response;
+import com.example.deliveryappproject.config.aop.annotation.OrderLogging;
+import com.example.deliveryappproject.domain.delivery.dto.DeliveryResponse;
 import com.example.deliveryappproject.domain.delivery.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +24,10 @@ public class DeliveryController {
         return ResponseEntity.noContent().build();
     }
 
+    @OrderLogging
     @PatchMapping("/{deliveryId}/complete")
-    public ResponseEntity<Void> completeDelivery(@PathVariable Long deliveryId) {
-        deliveryService.completeDelivery(deliveryId);
-        return ResponseEntity.noContent().build();
+    public Response<DeliveryResponse> completeDelivery(@PathVariable Long deliveryId) {
+        DeliveryResponse deliveryResponse = deliveryService.completeDelivery(deliveryId);
+        return Response.of(deliveryResponse);
     }
 }
