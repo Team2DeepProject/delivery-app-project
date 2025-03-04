@@ -7,7 +7,6 @@ import com.example.deliveryappproject.domain.user.dto.request.UserDeleteRequest;
 import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequest;
 import com.example.deliveryappproject.domain.user.dto.request.UserUpdateRequest;
 import com.example.deliveryappproject.domain.user.dto.response.UserResponse;
-import com.example.deliveryappproject.domain.user.dto.response.UserUpdateResponse;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
 import com.example.deliveryappproject.domain.user.enums.UserState;
@@ -79,7 +78,7 @@ public class UserService {
     }
 
     //로그인한 회원 정보 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public UserResponse fetchProfile(Long id) {
         User user = findUserByIdOrElseThrow(id);
 
@@ -92,14 +91,10 @@ public class UserService {
 
     //닉네임 수정
     @Transactional
-    public UserUpdateResponse updateUserName(Long id, UserUpdateRequest dto) {
+    public void updateUserName(Long id, UserUpdateRequest dto) {
         User user = findUserByIdOrElseThrow(id);
 
         user.update(dto.getUserName());
-        return new UserUpdateResponse(user.getUserName(),
-                user.getPoint(),
-                user.getUserRole().toString()
-        );
     }
 
     //회원 탈퇴

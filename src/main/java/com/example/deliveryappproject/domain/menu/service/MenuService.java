@@ -2,16 +2,14 @@ package com.example.deliveryappproject.domain.menu.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
-import com.example.deliveryappproject.common.exception.UnauthorizedException;
-import com.example.deliveryappproject.domain.menu.dto.MenuRequest;
-import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
+import com.example.deliveryappproject.domain.menu.dto.request.MenuRequest;
+import com.example.deliveryappproject.domain.menu.dto.response.MenuResponse;
 import com.example.deliveryappproject.domain.menu.entity.Menu;
 import com.example.deliveryappproject.domain.menu.enums.MenuState;
 import com.example.deliveryappproject.domain.menu.repository.MenuRepository;
 import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
-import com.example.deliveryappproject.domain.user.enums.UserRole;
 import com.example.deliveryappproject.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,8 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,27 +32,20 @@ public class MenuService {
 
     //메뉴 생성
     @Transactional
-    public MenuResponse saveMenu(Long id, MenuRequest dto) {
-        User user = userRepository.findById(id).orElseThrow(() ->
+    public void saveMenu(Long id, Long storeId, MenuRequest dto) {
+        userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Not Found UserId"));
 
-        if (menuRepository.existsByMenuNameAndStoreId(dto.getMenuName(), dto.getStoreId())) {
+        if (menuRepository.existsByMenuNameAndStoreId(dto.getMenuName(), storeId)) {
             throw new BadRequestException("동일메뉴는 불가능합니다.");
         }
 
-        Optional<Store> store = storeRepository.findById(dto.getStoreId());
+        Optional<Store> store = storeRepository.findById(storeId);
 
         Menu menu = new Menu(dto.getMenuName(), dto.getPrice(), dto.getInformation(), store.get());
 
         Menu savedMenu = menuRepository.save(menu);
 
-        return new MenuResponse(savedMenu.getId(),
-                savedMenu.getMenuName(),
-                savedMenu.getPrice(),
-                savedMenu.getInformation(),
-                MenuState.SALE.toString(),
-                savedMenu.getStore().getStoreName()
-        );
     }
 
     //전체 메뉴 조회
@@ -97,7 +88,7 @@ public class MenuService {
 
         Page<Menu> menu = menuRepository.findByStoreIdAndMenuState(pageable, storeId, MenuState.SALE);
 
-        Page<MenuResponse> menus = menu.map( m->
+        Page<MenuResponse> menus = menu.map(m ->
                 new MenuResponse(m.getId(),
                         m.getMenuName(),
                         m.getPrice(),
@@ -110,8 +101,8 @@ public class MenuService {
 
     //메뉴수정
     @Transactional
-    public MenuResponse updateMenu(Long userId, Long menuId, MenuRequest dto) {
-        User user = userRepository.findById(userId).orElseThrow(
+    public void updateMenu(Long userId, Long menuId, MenuRequest dto) {
+        userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Not Found userId"));
 
         Menu menu = menuRepository.findById(menuId).orElseThrow(
@@ -121,12 +112,6 @@ public class MenuService {
                 dto.getPrice(),
                 dto.getInformation());
 
-        return new MenuResponse(menu.getId(),
-                menu.getMenuName(),
-                menu.getPrice(),
-                menu.getInformation(),
-                menu.getMenuState().toString(),
-                menu.getStore().getStoreName());
     }
 
     //메뉴 삭제(상태 변경만)
@@ -143,7 +128,7 @@ public class MenuService {
         List<Store> stores = storeRepository.findByUserId(userId);
 
         for (Store userStore : stores) {
-            if (userStore == menuStore)
+            if (ObjectUtils.nullSafeEquals(userStore,menuStore))//  객체 비교에는 equals
                 menu.setMenuState(MenuState.DELETE);
         }
     }

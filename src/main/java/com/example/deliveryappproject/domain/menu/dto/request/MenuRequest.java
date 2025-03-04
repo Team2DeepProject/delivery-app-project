@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.domain.menu.dto;
+package com.example.deliveryappproject.domain.menu.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,10 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuRequest {
-
     private String menuName;
     private BigDecimal price;
     private String information;
-    private Long storeId;
-
 }

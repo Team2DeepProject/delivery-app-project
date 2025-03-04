@@ -7,15 +7,12 @@ import com.example.deliveryappproject.domain.user.dto.request.UserDeleteRequest;
 import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequest;
 import com.example.deliveryappproject.domain.user.dto.request.UserUpdateRequest;
 import com.example.deliveryappproject.domain.user.dto.response.UserResponse;
-import com.example.deliveryappproject.domain.user.dto.response.UserUpdateResponse;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,9 +45,10 @@ public class UserController {
 
     //회원 정보 수정
     @PatchMapping
-    public ResponseEntity<UserUpdateResponse> updateUserName(@Auth AuthUser authUser,
+    public ResponseEntity<String> updateUserName(@Auth AuthUser authUser,
                                                              @RequestBody UserUpdateRequest dto){
-        return ResponseEntity.ok(userService.updateUserName(authUser.getId(), dto));
+        userService.updateUserName(authUser.getId(),dto);
+        return ResponseEntity.ok("회원정보가 업데이트 되었습니다.");
     }
 
     //회원 탈퇴
