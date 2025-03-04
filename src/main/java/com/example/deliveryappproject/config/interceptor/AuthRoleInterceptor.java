@@ -1,10 +1,9 @@
 package com.example.deliveryappproject.config.interceptor;
 
 import com.example.deliveryappproject.common.annotation.AuthPermission;
-import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.BadRequestException;
