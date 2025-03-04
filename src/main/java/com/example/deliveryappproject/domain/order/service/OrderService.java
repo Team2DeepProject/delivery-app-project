@@ -1,6 +1,7 @@
 package com.example.deliveryappproject.domain.order.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
+import com.example.deliveryappproject.domain.cart.model.CartItem;
 import com.example.deliveryappproject.domain.cart.repository.CartRepository;
 import com.example.deliveryappproject.domain.delivery.entity.Delivery;
 import com.example.deliveryappproject.domain.delivery.repository.DeliveryRepository;
@@ -41,31 +42,27 @@ public class OrderService {
 
     @Transactional
     public OrderResponse order(Long userId, OrderRequest orderRequest) {
-        Map<String, String> cartDetails = cartRepository.getCartDetails(userId);
-        //주문을 할 때
-        //장바구니 확인
-        if (cartDetails.isEmpty()) {
+
+        Long storeId = cartRepository.findStoreId(userId);
+
+        if (storeId == null) {
             throw new BadRequestException("Cart is empty");
         }
 
-        String storeId = cartDetails.get("storeId");
-        if (storeId == null) {
-            throw new BadRequestException("Invalid cart data");
-        }
-        Store store = storeRepository.findById(Long.parseLong(storeId))
+        Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BadRequestException("store Not Found"));
 
 
         //최소 주문 금액 검증
-        List<Long> itemIds = cartDetails.keySet().stream()
-                .filter(key -> key.startsWith("items:"))
-                .map(key -> Long.parseLong(key.replace("items:", "")))
+        List<CartItem> items = cartRepository.findItems(userId);
+        List<Long> itemIds = items.stream()
+                .map(item -> item.getItemId())
                 .toList();
 
         //임시
         List<Menu> menus = menuRepository.findAllById(itemIds);
         Map<Long, Menu> menuMap = menus.stream().collect(Collectors.toMap(Menu::getId, menu -> menu));
-        BigDecimal totalPrice = calculateTotalPrice(menuMap, cartDetails);
+        BigDecimal totalPrice = calculateTotalPrice(menuMap, items);
 
         if (totalPrice.compareTo(store.getMinOrderPrice()) < 0) {
             throw new BadRequestException("최소주문 금액을 맞춰주세요");
@@ -78,10 +75,9 @@ public class OrderService {
         if (usePoints > 0 && usePoints > user.getPoint()) {
             throw new BadRequestException("포인트가 부족합니다.");
         }
-
         Order order = new Order(user, store, usePoints);
 
-        convertAndAddOrderItems(order,menuMap, cartDetails);
+        convertAndAddOrderItems(order,menuMap, items);
 
 
         orderRepository.save(order);
@@ -153,45 +149,38 @@ public class OrderService {
 
     }
 
-    private void convertAndAddOrderItems(Order order, Map<Long, Menu> menuMap, Map<String, String> cartDetails) {
+    private void convertAndAddOrderItems(Order order, Map<Long, Menu> menuMap, List<CartItem> items) {
 
-        for (Map.Entry<String, String> entry : cartDetails.entrySet()) {
-            String key = entry.getKey();
-            if (key.startsWith("items:")) {
-                Long itemId = Long.parseLong(key.replace("items:", ""));
-                int quantity = Integer.parseInt(entry.getValue());
+        for (CartItem item : items) {
+            Long itemId = item.getItemId();
+            int quantity = item.getQuantity();
 
-                Menu menu = menuMap.get(itemId);
-                if (menu == null) {
-                    throw new BadRequestException("menu not found: " + itemId);
-                }
-
-
-                BigDecimal menuTotalPrice = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
-                OrderItem orderItem = OrderItem.createOrderItem(menu, menuTotalPrice, quantity);
-                order.addOrderItem(orderItem);
+            Menu menu = menuMap.get(itemId);
+            if (menu == null) {
+                throw new BadRequestException("menu not found: " + itemId);
             }
+
+
+            BigDecimal menuTotalPrice = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
+            OrderItem orderItem = OrderItem.createOrderItem(menu, menuTotalPrice, quantity);
+            order.addOrderItem(orderItem);
         }
     }
 
-    private BigDecimal calculateTotalPrice(Map<Long, Menu> menuMap, Map<String, String> cartDetails) {
+    private BigDecimal calculateTotalPrice(Map<Long, Menu> menuMap, List<CartItem> items) {
         BigDecimal totalPrice = BigDecimal.ZERO;
 
-        for (Map.Entry<String, String> entry : cartDetails.entrySet()) {
-            String key = entry.getKey();
-            if (key.startsWith("items:")) {
-                Long itemId = Long.parseLong(key.replace("items:", ""));
-                int quantity = Integer.parseInt(entry.getValue());
+        for (CartItem item : items) {
+            Long itemId = item.getItemId();
+            int quantity = item.getQuantity();
 
-                Menu menu = menuMap.get(itemId);
-                if (menu == null) {
-                    throw new BadRequestException("menu not found: " + itemId);
-                }
-
-                BigDecimal menuTotalPrice = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
-                totalPrice = totalPrice.add(menuTotalPrice);
-
+            Menu menu = menuMap.get(itemId);
+            if (menu == null) {
+                throw new BadRequestException("menu not found: " + itemId);
             }
+
+            BigDecimal menuTotalPrice = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
+            totalPrice = totalPrice.add(menuTotalPrice);
         }
         return totalPrice;
 
