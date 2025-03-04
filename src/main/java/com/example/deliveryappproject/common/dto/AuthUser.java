@@ -1,6 +1,6 @@
 package com.example.deliveryappproject.common.dto;
 
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import lombok.Getter;
 
 @Getter

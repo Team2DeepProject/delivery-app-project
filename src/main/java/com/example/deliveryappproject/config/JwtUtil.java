@@ -1,7 +1,7 @@
 package com.example.deliveryappproject.config;
 
 import com.example.deliveryappproject.common.exception.UnauthorizedException;
-import com.example.deliveryappproject.domain.user.entity.UserRole;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
