@@ -11,11 +11,13 @@ public class ReviewResponse {
     private final String content;
     private final int rating;
     private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
     public ReviewResponse(Review review) {
         this.id = review.getId();
         this.content = review.getContent();
         this.rating = review.getRating();
         this.createdAt = review.getCreatedAt();
+        this.updatedAt = review.getUpdatedAt();
     }
 }
