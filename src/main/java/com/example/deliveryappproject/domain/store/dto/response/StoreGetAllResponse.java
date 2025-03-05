@@ -19,10 +19,7 @@ import static jakarta.persistence.EnumType.STRING;
 @AllArgsConstructor
 public class StoreGetAllResponse {
 
-    private final Long id;
-    private final String userName;
     private final String storeName;
-    private final String storeState;
 
     @JsonFormat(pattern = "HH:mm")
     private final LocalTime openAt;
@@ -30,16 +27,16 @@ public class StoreGetAllResponse {
     @JsonFormat(pattern = "HH:mm")
     private final LocalTime closeAt;
 
+    private final int bookmarkCount;
+
     private final int minOrderPrice;
 
-    public static StoreGetAllResponse fromDto(Store store) {
+    public static StoreGetAllResponse fromDto(Store store, int bookmarkCount) {
         return StoreGetAllResponse.builder()
-                .id(store.getId())
-                .userName(store.getUser().getUserName())
                 .storeName(store.getStoreName())
-                .storeState(store.getStoreState().name())
                 .openAt(store.getOpenAt())
                 .closeAt(store.getCloseAt())
+                .bookmarkCount(bookmarkCount)
                 .minOrderPrice(store.getMinOrderPrice().intValue())
                 .build();
     }

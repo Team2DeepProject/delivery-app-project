@@ -25,7 +25,7 @@ public class BookmarkService {
     // 토글형식 즐겨찾기 추가 삭제
     @Transactional
     public boolean toggleUserBookmark(Long storeId, Long userId) {
-        User user = userService.getUserById(userId);
+        User user = userService.findUserByIdOrElseThrow(userId);
         Store store = storeService.findStoreByIdOrElseThrow(storeId);
 
         return bookmarkRepository.findByUserIdAndStoreId(userId, storeId)

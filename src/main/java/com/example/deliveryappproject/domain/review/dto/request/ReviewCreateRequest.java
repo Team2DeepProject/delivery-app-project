@@ -16,4 +16,9 @@ public class ReviewCreateRequest {
     @Min(value = 1, message = "평점은 최소 1점 이상이어야 합니다.")
     @Max(value = 5, message = "평점은 최대 5점 이하이어야 합니다.")
     private int rating;
+
+    public ReviewCreateRequest(String content, int rating) {
+        this.content = content;
+        this.rating = rating;
+    }
 }

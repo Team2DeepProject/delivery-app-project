@@ -1,6 +1,5 @@
 package com.example.deliveryappproject.domain.bookmark.service;
 
-import com.example.deliveryappproject.common.response.Response;
 import com.example.deliveryappproject.domain.bookmark.dto.response.BookmarkResponseDto;
 import com.example.deliveryappproject.domain.bookmark.entity.Bookmark;
 import com.example.deliveryappproject.domain.bookmark.repository.BookmarkRepository;
@@ -47,9 +46,9 @@ class BookmarkServiceTest {
         Store store = new Store(user, "일식가게", null, null, null);
         Bookmark bookmark = new Bookmark(user, store);
 
-        given(userService.getUserById(userId)).willReturn(user);
-        given(storeService.findStoreByIdOrElseThrow(storeId)).willReturn(store);
-        given(bookmarkRepository.findByUserIdAndStoreId(userId, storeId)).willReturn(Optional.empty());
+        given(userService.findUserByIdOrElseThrow(any())).willReturn(user);
+        given(storeService.findStoreByIdOrElseThrow(any())).willReturn(store);
+        given(bookmarkRepository.findByUserIdAndStoreId(any(), any())).willReturn(Optional.empty());
 
         // When
         boolean isBookmarked = bookmarkService.toggleUserBookmark(storeId, userId);
@@ -65,7 +64,7 @@ class BookmarkServiceTest {
         Long userId = 1L;
         Long storeId = 1L;
 
-        given(userService.getUserById(userId)).willThrow(new RuntimeException("사용자를 찾을수 없음"));
+        given(userService.findUserByIdOrElseThrow(userId)).willThrow(new RuntimeException("사용자를 찾을수 없음"));
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,

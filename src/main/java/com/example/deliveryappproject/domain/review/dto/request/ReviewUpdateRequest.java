@@ -9,4 +9,9 @@ public class ReviewUpdateRequest {
 
     private String content;
     private int rating;
+
+    public ReviewUpdateRequest(String content, int rating) {
+        this.content = content;
+        this.rating = rating;
+    }
 }
