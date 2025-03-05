@@ -17,6 +17,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     boolean existsByReviewAndUserIdAndUserRole(@Param("review") Review review,
                                                @Param("userId") Long userId,
                                                @Param("userRole") UserRole userRole);
-    
+
+    Optional<Comment> findByReviewAndUserId(Review review, Long userId);
+
     Optional<Comment> findByReviewAndUser(Review review, User owner);
 }
