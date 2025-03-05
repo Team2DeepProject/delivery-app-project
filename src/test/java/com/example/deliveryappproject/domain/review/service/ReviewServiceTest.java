@@ -19,6 +19,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
@@ -71,11 +73,10 @@ public class ReviewServiceTest {
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
 
         // when
-        ReviewResponse response = reviewService.createReview(authUser, 1L, request);
+        ResponseEntity<Void> response = reviewService.createReview(authUser, 1L, request);
 
         // then
-        assertEquals("맛있어요", response.getContent());
-        assertEquals(5, response.getRating());
+        assertEquals(HttpStatus.OK, response.getStatusCode());  // 상태 코드가 200 OK여야 함
         verify(reviewRepository, times(1)).save(any(Review.class));
     }
 
