@@ -27,18 +27,13 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // 댓글을 단 사용자
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole userRole;  // 댓글을 단 사용자 역할
-
     @Column(nullable = false)
     private String content;
 
     @Builder
-    public Comment(Review review, User user, UserRole userRole, String content) {
+    public Comment(Review review, User user, String content) {
         this.review = review;
         this.user = user;
-        this.userRole = userRole;
         this.content = content;
     }
 

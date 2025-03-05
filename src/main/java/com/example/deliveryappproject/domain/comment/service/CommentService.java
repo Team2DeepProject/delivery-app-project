@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -30,7 +32,7 @@ public class CommentService {
                 .orElseThrow(() -> new BadRequestException("리뷰를 찾을 수 없습니다."));
 
         // 해당 가게의 사장님이 맞는지 확인
-        if (!review.getStore().getUser().getId().equals(authUser.getId())) {
+        if (!Objects.equals(review.getStore().getUser().getId(), authUser.getId())) {
             throw new BadRequestException("해당 가게의 사장님만 댓글을 달 수 있습니다.");
         }
 
@@ -39,13 +41,11 @@ public class CommentService {
             throw new BadRequestException("리뷰에 대한 사장님 댓글은 하나만 작성할 수 있습니다.");
         }
 
-        // 댓글 생성
-        User user = new User(authUser.getId()); // 인증된 사용자 정보 사용
+        User user = new User(authUser.getId());
         Comment comment = Comment.builder()
                 .review(review)
                 .user(user)
                 .content(request.getContent())
-                .userRole(UserRole.OWNER)  // 역할 설정
                 .build();
 
         Comment savedComment = commentRepository.save(comment);

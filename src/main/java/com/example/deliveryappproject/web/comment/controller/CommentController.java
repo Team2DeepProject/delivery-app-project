@@ -3,6 +3,7 @@ package com.example.deliveryappproject.web.comment.controller;
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
+import com.example.deliveryappproject.common.response.Response;
 import com.example.deliveryappproject.domain.auth.service.TokenService;
 import com.example.deliveryappproject.domain.comment.dto.reponse.CommentResponse;
 import com.example.deliveryappproject.domain.comment.dto.request.CommentRequest;
@@ -15,25 +16,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/reviews/{reviewId}/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
     // 댓글 생성
-    @PostMapping
+    @PostMapping("/reviews/{reviewId}/comments")
+    @AuthPermission(role = UserRole.OWNER)
     public ResponseEntity<Void> createComment(
             @Auth AuthUser authUser,
             @PathVariable Long reviewId,
             @Valid @RequestBody CommentRequest request
     ) {
         commentService.createComment(authUser, reviewId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();  // 응답 없음
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // 댓글 조회
-    @GetMapping("/owner/{userId}")
+    @GetMapping("/reviews/{reviewId}/comments")
     public ResponseEntity<CommentResponse> getOwnerComment(
             @PathVariable Long reviewId,
             @PathVariable Long userId
@@ -43,7 +44,7 @@ public class CommentController {
     }
 
     // 댓글 수정
-    @PutMapping("/{commentId}")
+    @PutMapping("comments/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
             @Valid @RequestBody CommentRequest request
@@ -53,7 +54,7 @@ public class CommentController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
