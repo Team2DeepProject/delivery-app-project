@@ -9,7 +9,6 @@ import com.example.deliveryappproject.domain.review.dto.response.ReviewResponse;
 import com.example.deliveryappproject.domain.review.entity.Review;
 import com.example.deliveryappproject.domain.review.service.ReviewService;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
-import com.example.deliveryappproject.domain.user.enums.UserRole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

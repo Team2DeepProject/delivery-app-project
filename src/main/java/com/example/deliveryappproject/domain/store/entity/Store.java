@@ -57,6 +57,11 @@ public class Store extends Timestamped {
         this.minOrderPrice = minOrderPrice;
     }
 
+    public Store(Long id, User user) {
+        this.id = id;
+        this.user = user;
+    }
+
     public void updateStoreState(StoreState storeState) {
         this.storeState = storeState;
     }
@@ -66,6 +71,12 @@ public class Store extends Timestamped {
         this.openAt = openAt;
         this.closeAt = closeAt;
         this.minOrderPrice = minOrderPrice;
+    }
+
+    public boolean isOrderAvailable() {
+        LocalTime now = LocalTime.now();
+
+        return !now.isBefore(openAt) && !now.isAfter(closeAt);
     }
 
 }

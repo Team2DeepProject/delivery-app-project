@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 import static lombok.AccessLevel.PROTECTED;
@@ -15,7 +14,6 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "bookmarks")
 public class Bookmark extends Timestamped {
 

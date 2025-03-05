@@ -2,59 +2,42 @@ package com.example.deliveryappproject.domain.cart.service;
 
 import com.example.deliveryappproject.domain.cart.dto.CartItemResponse;
 import com.example.deliveryappproject.domain.cart.dto.CartItemsRequest;
-import com.example.deliveryappproject.domain.cart.dto.CartItemsSaveResponse;
 import com.example.deliveryappproject.domain.cart.dto.CartResponse;
+import com.example.deliveryappproject.domain.cart.model.CartItem;
 import com.example.deliveryappproject.domain.cart.repository.CartRepository;
 import com.example.deliveryappproject.domain.cart.repository.RedisLockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final RedisLockRepository redisLockRepository;
+    private final RedisLockService redisLockService;
 
-    public CartItemsSaveResponse addItems(Long userId, CartItemsRequest cartItemsRequest) {
-        redisLockRepository.waitForLock(userId);
-        try {
-            Optional<Long> storeId = cartRepository.findStoreId(userId);
-            if (storeId.isEmpty() || storeId.get() != cartItemsRequest.getStoreId()) {
+    public void addItems(Long userId, CartItemsRequest cartItemsRequest) {
+
+        redisLockService.executeWithLock(userId, () -> {
+            Long storeId = cartRepository.findStoreId(userId);
+
+            if (storeId == null  || storeId != cartItemsRequest.getStoreId()) {
                 cartRepository.clear(userId);
             }
+
             cartRepository.saveItems(userId, cartItemsRequest);
-        } finally {
-            redisLockRepository.unLock(userId);
-        }
-        Map<String, String> items = cartRepository.getCartDetails(userId);
-        List<CartItemResponse> cartItemResponseList = items.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith("items:"))
-                .map(entry -> {
-                    long itemId = Long.parseLong(entry.getKey().split(":")[1]);
-                    int quantity = Integer.parseInt(entry.getValue());
-                    return new CartItemResponse(itemId, quantity);
-                }).toList();
-        CartResponse cartResponse = new CartResponse(cartItemsRequest.getStoreId(), cartItemResponseList);
-        return new CartItemsSaveResponse("성공", cartResponse);
+        });
+
     }
 
     public CartResponse getItems(Long userId) {
-        Long storeId = cartRepository.findStoreId(userId).orElse(null);
+        Long storeId = cartRepository.findStoreId(userId);
+        List<CartItem> cartItems = cartRepository.findItems(userId);
 
-        Map<String, String> items = cartRepository.getCartDetails(userId);
-        List<CartItemResponse> cartItemResponseList = items.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith("items:"))
-                .map(entry -> {
-                    long itemId = Long.parseLong(entry.getKey().split(":")[1]);
-                    int quantity = Integer.parseInt(entry.getValue());
-                    return new CartItemResponse(itemId, quantity);
-                }).toList();
-        return new CartResponse(storeId, cartItemResponseList);
+        List<CartItemResponse> cartItemResponses = cartItems.stream().map(CartItemResponse::from).toList();
+        return new CartResponse(storeId, cartItemResponses);
     }
 
     public void clearCart(Long userId) {

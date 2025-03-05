@@ -2,6 +2,7 @@ package com.example.deliveryappproject.common.exception;
 
 import com.example.deliveryappproject.common.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +23,12 @@ public class GlobalExceptionHandler {
                 map(fieldError -> fieldError.getDefaultMessage()).
                 orElseThrow(() -> new IllegalStateException("검증 에러가 반드시 존재해야 합니다."));
         return ErrorResponse.of("VALIDATION_ERROR", errorMessage);
+    }
+
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        return ErrorResponse.of("UNIQUE_ERROR", "존재하는 데이터입니다.");
     }
 
     @ExceptionHandler(CustomException.class)

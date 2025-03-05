@@ -19,7 +19,7 @@ public class RedisLockRepository {
     /**
      * 락 획득 (NX 옵션)
      */
-    public Boolean lock(Long key) {
+    private Boolean lock(Long key) {
         return redisTemplate
                 .opsForValue()
                 .setIfAbsent(generated(key), "lock", Duration.ofMillis(DEFAULT_LOCK_TIMEOUT));

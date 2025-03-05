@@ -64,4 +64,6 @@ public class User extends Timestamped { // Timestamped 추가
     public void addPoints(int earnedPoints) {
         this.point += earnedPoints;
     }
+
+    public void updateUserRole(UserRole userRole) { this.userRole=userRole; }
 }
