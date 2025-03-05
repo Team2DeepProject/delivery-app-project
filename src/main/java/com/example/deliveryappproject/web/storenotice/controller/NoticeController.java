@@ -19,14 +19,14 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/notices")
+@RequestMapping("/stores/{storeId}/notices")
 public class NoticeController {
 
     private final NoticeService noticeService;
 
     // 공지 생성
     @AuthPermission(role = UserRole.OWNER)
-    @PostMapping("/{storeId}")
+    @PostMapping
     public MessageResponse createNotice(@PathVariable Long storeId,
                                        @Auth AuthUser authUser,
                                        @RequestBody NoticeRequestDto request
@@ -36,7 +36,7 @@ public class NoticeController {
     }
 
     // 공지 조회
-    @GetMapping("/{storeId}")
+    @GetMapping
     public Response<NoticeResponseDto> getStoreNotices(@PathVariable Long storeId,
                                                        @SortDefault(sort = "createdAt", direction = DESC) Pageable pageable
     ) {
