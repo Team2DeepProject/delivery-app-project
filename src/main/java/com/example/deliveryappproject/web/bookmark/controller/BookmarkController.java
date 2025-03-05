@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.web.bookmark.controller;
+package com.example.deliveryappproject.domain.bookmark.controller;
 
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.dto.AuthUser;
@@ -24,6 +24,7 @@ public class BookmarkController {
     public Response<BookmarkResponseDto> getUserBookmarks(@Auth AuthUser authUser, Pageable pageable) {
         Page<BookmarkResponseDto> bookmarks = bookmarkService.getUserBookmarks(authUser.getId(), pageable);
         return Response.fromPage(bookmarks);
+//        return Response.of(, "즐겨찾기 조회 성공");
     }
 
     // 즐겨찾기 등록-삭제
