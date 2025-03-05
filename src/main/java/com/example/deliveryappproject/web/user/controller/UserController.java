@@ -3,6 +3,7 @@ package com.example.deliveryappproject.web.user.controller;
 
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.dto.AuthUser;
+import com.example.deliveryappproject.common.response.MessageResponse;
 import com.example.deliveryappproject.domain.user.dto.request.UserDeleteRequest;
 import com.example.deliveryappproject.domain.user.dto.request.UserSignupRequest;
 import com.example.deliveryappproject.domain.user.dto.request.UserUpdateRequest;
@@ -23,9 +24,9 @@ public class UserController {
 
     //회원가입
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@Valid @RequestBody UserSignupRequest signupRequestDto) {
+    public MessageResponse signup(@Valid @RequestBody UserSignupRequest signupRequestDto) {
         userService.signup(signupRequestDto);
-        return ResponseEntity.ok("회원가입을 축하드립니다.");
+        return MessageResponse.of("회원가입을 축하드립니다.");
     }
 
     //회원목록 전체조회
@@ -45,18 +46,18 @@ public class UserController {
 
     //회원 정보 수정
     @PatchMapping
-    public ResponseEntity<String> updateUserName(@Auth AuthUser authUser,
+    public MessageResponse updateUserName(@Auth AuthUser authUser,
                                                              @RequestBody UserUpdateRequest dto){
         userService.updateUserName(authUser.getId(),dto);
-        return ResponseEntity.ok("회원정보가 업데이트 되었습니다.");
+        return MessageResponse.of("회원정보가 업데이트 되었습니다.");
     }
 
     //회원 탈퇴
     @PostMapping("/delete")
-    public ResponseEntity<String> deleteAccount(@Auth AuthUser authUser,
+    public MessageResponse deleteAccount(@Auth AuthUser authUser,
                                                       @RequestBody UserDeleteRequest dto){
         userService.deleteUser(authUser.getId(), dto);
-        return ResponseEntity.ok("회원탈퇴가 되었습니다.");
+        return MessageResponse.of("회원탈퇴가 되었습니다.");
     }
 
 }

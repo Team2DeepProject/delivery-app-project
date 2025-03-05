@@ -46,7 +46,6 @@ public class UserService {
         User newUser = new User(signupRequestDto.getEmail(), encodedPassword, signupRequestDto.getUserName(), userRole);
 
         userRepository.save(newUser);
-
     }
 
     //회원 전체 조회

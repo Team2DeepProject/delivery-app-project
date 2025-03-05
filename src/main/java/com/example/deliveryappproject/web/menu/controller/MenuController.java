@@ -3,6 +3,7 @@ package com.example.deliveryappproject.web.menu.controller;
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
+import com.example.deliveryappproject.common.response.MessageResponse;
 import com.example.deliveryappproject.domain.menu.dto.request.MenuRequest;
 import com.example.deliveryappproject.domain.menu.dto.response.MenuResponse;
 import com.example.deliveryappproject.domain.menu.service.MenuService;
@@ -21,11 +22,11 @@ public class MenuController {
     //메뉴 생성
     @AuthPermission(role = UserRole.OWNER)
     @PostMapping("/stores/{storeId}/menus")
-    public ResponseEntity<String> saveMenu(@Auth AuthUser authUser,
-                                                 @PathVariable Long storeId,
-                                                 @RequestBody MenuRequest dto) {
+    public MessageResponse saveMenu(@Auth AuthUser authUser,
+                                    @PathVariable Long storeId,
+                                    @RequestBody MenuRequest dto) {
         menuService.saveMenu(authUser.getId(), storeId, dto);
-        return ResponseEntity.ok("메뉴를 추가했습니다.");
+        return MessageResponse.of("메뉴를 추가했습니다.");
     }
 
     //전체 메뉴 조회
@@ -55,16 +56,16 @@ public class MenuController {
     //메뉴 수정
     @AuthPermission(role = UserRole.OWNER)
     @PatchMapping("/menus/{menuId}")
-    public ResponseEntity<String> updateMenu(@Auth AuthUser authUser, @PathVariable Long menuId, @RequestBody MenuRequest dto) {
+    public MessageResponse updateMenu(@Auth AuthUser authUser, @PathVariable Long menuId, @RequestBody MenuRequest dto) {
         menuService.updateMenu(authUser.getId(), menuId, dto);
-        return ResponseEntity.ok("메뉴를 수정했습니다.");
+        return MessageResponse.of("메뉴를 수정했습니다.");
     }
 
     //메뉴 삭제
     @AuthPermission(role = UserRole.OWNER)
     @DeleteMapping("/menus/{menuId}")
-    public ResponseEntity<String> deleteMenu(@Auth AuthUser authUser, @PathVariable Long menuId) {
+    public MessageResponse deleteMenu(@Auth AuthUser authUser, @PathVariable Long menuId) {
         menuService.deleteMenu(authUser.getId(), menuId);
-        return ResponseEntity.ok("해당 메뉴를 삭제했습니다.");
+        return MessageResponse.of("해당 메뉴를 삭제했습니다.");
     }
 }
