@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -88,4 +89,13 @@ public class Order {
     public void cancelOrder() {
         this.orderStatus = OrderStatus.CANCEL;
     }
+
+    public boolean isPending() {
+        return this.orderStatus == OrderStatus.PENDING;
+    }
+
+    public boolean isOwner(Long userId) {
+        return this.user != null && Objects.equals(this.user.getId(),userId);
+    }
+
 }

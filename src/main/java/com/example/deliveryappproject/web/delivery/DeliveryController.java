@@ -1,9 +1,11 @@
 package com.example.deliveryappproject.web.delivery;
 
+import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.response.Response;
 import com.example.deliveryappproject.config.aop.annotation.OrderLogging;
 import com.example.deliveryappproject.domain.delivery.dto.DeliveryResponse;
 import com.example.deliveryappproject.domain.delivery.service.DeliveryService;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,16 +20,17 @@ public class DeliveryController {
 
     private final DeliveryService deliveryService;
 
+    @AuthPermission(role = UserRole.RIDER)
     @PatchMapping("/{deliveryId}/start")
-    public ResponseEntity<Void> startDelivery(@PathVariable Long deliveryId) {
+    public Response<Void> startDelivery(@PathVariable Long deliveryId) {
         deliveryService.startDelivery(deliveryId);
-        return ResponseEntity.noContent().build();
+        return Response.empty();
     }
 
+    @AuthPermission(role = UserRole.RIDER)
     @OrderLogging
     @PatchMapping("/{deliveryId}/complete")
     public Response<DeliveryResponse> completeDelivery(@PathVariable Long deliveryId) {
-        DeliveryResponse deliveryResponse = deliveryService.completeDelivery(deliveryId);
-        return Response.of(deliveryResponse);
+        return Response.of(deliveryService.completeDelivery(deliveryId));
     }
 }

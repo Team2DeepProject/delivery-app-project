@@ -1,6 +1,7 @@
 package com.example.deliveryappproject.domain.delivery.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
+import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.domain.delivery.dto.DeliveryResponse;
 import com.example.deliveryappproject.domain.delivery.entity.Delivery;
 import com.example.deliveryappproject.domain.delivery.entity.DeliveryStatus;
@@ -19,7 +20,7 @@ public class DeliveryService {
 
     @Transactional
     public void startDelivery(Long deliveryId) {
-        Delivery delivery = deliveryRepository.findById(deliveryId).orElseThrow(() -> new BadRequestException("delivery not found"));
+        Delivery delivery = findByIdOrElseThrow(deliveryId);
         if (delivery.getDeliveryStatus() != DeliveryStatus.PENDING) {
             throw new BadRequestException("Delivery is not pending");
         }
@@ -30,7 +31,7 @@ public class DeliveryService {
     @Transactional
     public DeliveryResponse completeDelivery(Long deliveryId) {
 
-        Delivery delivery = deliveryRepository.findById(deliveryId).orElseThrow(() -> new BadRequestException("delivery not found"));
+        Delivery delivery = findByIdOrElseThrow(deliveryId);
         if (delivery.getDeliveryStatus() != DeliveryStatus.READY) {
             throw new BadRequestException("Delivery is not ready");
         }
@@ -47,5 +48,9 @@ public class DeliveryService {
 
         return DeliveryResponse.of(order.getId(),order.getStore().getId(), order.getOrderStatus());
 
+    }
+
+    private Delivery findByIdOrElseThrow(Long deliveryId) {
+        return deliveryRepository.findById(deliveryId).orElseThrow(() -> new NotFoundException("delivery not found"));
     }
 }
