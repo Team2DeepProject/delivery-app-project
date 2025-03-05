@@ -35,8 +35,11 @@ public class CommentController {
 
     // 댓글 조회
     @GetMapping("/reviews/{reviewId}/comments")
-    public ResponseEntity<CommentResponse> getOwnerComment(@PathVariable Long reviewId) {
-        CommentResponse commentResponse = commentService.getOwnerComment(reviewId);
+    public ResponseEntity<CommentResponse> getOwnerComment(
+            @Auth AuthUser authUser,
+            @PathVariable Long reviewId
+    ) {
+        CommentResponse commentResponse = commentService.getOwnerComment(reviewId, authUser);
         return ResponseEntity.ok(commentResponse);
     }
 

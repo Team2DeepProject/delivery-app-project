@@ -60,7 +60,7 @@ class CommentServiceTest {
         user = createUser(userId, UserRole.USER);
 
         // 가게, 리뷰 객체 생성
-        store = createStore(owner, storeId);
+        store = createStore(storeId, owner);
         review = createReview(store, owner);
     }
 
@@ -70,21 +70,12 @@ class CommentServiceTest {
         return newUser;
     }
 
-    private Store createStore(User owner, Long storeId) {
-        Store store = Store.builder()
-                .user(owner)
-                .storeName("Test Store")
-                .openAt(LocalTime.of(9, 0))
-                .closeAt(LocalTime.of(21, 0))
-                .minOrderPrice(BigDecimal.valueOf(10000))
-                .build();
-        try {
-            store.getClass().getDeclaredField("id").set(store, storeId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return store;
+    private Store createStore(Long id, User owner) {
+        return new Store(id, owner, "테스트 가게",
+                LocalTime.of(9, 0), LocalTime.of(22, 0),
+                BigDecimal.valueOf(10000));
     }
+
 
     private Review createReview(Store store, User owner) {
         return Review.builder()
@@ -154,12 +145,14 @@ class CommentServiceTest {
         Long reviewId = 1L;
         AuthUser authUser = new AuthUser(owner.getId(), "owner@example.com", UserRole.OWNER);
 
+        // 리뷰와 댓글이 존재한다고 설정
         given(reviewRepository.findById(reviewId)).willReturn(java.util.Optional.of(review));
-        given(commentRepository.findByReviewAndUserId(review, owner.getId()))
-                .willReturn(java.util.Optional.of(createComment(owner, review)));
+        Comment comment = createComment(owner, review);
+        given(commentRepository.findByReviewAndUser(review, owner))
+                .willReturn(java.util.Optional.of(comment));  // 댓글 반환을 추가
 
         // When
-        CommentResponse response = commentService.getOwnerComment(reviewId);
+        CommentResponse response = commentService.getOwnerComment(reviewId, authUser);
 
         // Then
         assertNotNull(response);
@@ -177,7 +170,7 @@ class CommentServiceTest {
 
         // When & Then
         BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> commentService.getOwnerComment(reviewId));
+                () -> commentService.getOwnerComment(reviewId, authUser));
         assertEquals("이 리뷰에 대한 사장님의 댓글을 조회할 권한이 없습니다.", exception.getMessage());
     }
 

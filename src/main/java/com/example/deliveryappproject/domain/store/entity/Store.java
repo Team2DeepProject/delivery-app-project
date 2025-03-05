@@ -57,6 +57,16 @@ public class Store extends Timestamped {
         this.closeAt = closeAt;
         this.minOrderPrice = minOrderPrice;
     }
+  
+    public Store(Long id, User user, String storeName, LocalTime openAt, LocalTime closeAt, BigDecimal minOrderPrice) {
+        this.id = id;
+        this.user = user;
+        this.storeName = storeName;
+        this.storeState = StoreState.ACTIVE;
+        this.openAt = openAt;
+        this.closeAt = closeAt;
+        this.minOrderPrice = minOrderPrice;
+    }
 
     public Store(Long id, User user) {
         this.id = id;
