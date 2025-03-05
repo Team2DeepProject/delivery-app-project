@@ -2,6 +2,7 @@ package com.example.deliveryappproject.domain.comment.repository;
 
 import com.example.deliveryappproject.domain.comment.entity.Comment;
 import com.example.deliveryappproject.domain.review.entity.Review;
+import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     boolean existsByReviewAndUserIdAndUserRole(@Param("review") Review review,
                                                @Param("userId") Long userId,
                                                @Param("userRole") UserRole userRole);
-
-    Optional<Comment> findByReviewAndUserId(Review review, Long userId);
+    
+    Optional<Comment> findByReviewAndUser(Review review, User owner);
 }
