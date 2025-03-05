@@ -1,23 +1,25 @@
 package com.example.deliveryappproject.domain.order.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
+import com.example.deliveryappproject.common.exception.ForbiddenException;
+import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.domain.cart.model.CartItem;
 import com.example.deliveryappproject.domain.cart.repository.CartRepository;
 import com.example.deliveryappproject.domain.delivery.entity.Delivery;
 import com.example.deliveryappproject.domain.delivery.repository.DeliveryRepository;
 import com.example.deliveryappproject.domain.menu.entity.Menu;
 import com.example.deliveryappproject.domain.menu.repository.MenuRepository;
+import com.example.deliveryappproject.domain.order.dto.OrderDetailResponse;
 import com.example.deliveryappproject.domain.order.dto.OrderRequest;
 import com.example.deliveryappproject.domain.order.entity.Order;
 import com.example.deliveryappproject.domain.order.entity.OrderItem;
-import com.example.deliveryappproject.domain.order.entity.OrderStatus;
 import com.example.deliveryappproject.domain.order.repository.OrderRepository;
 import com.example.deliveryappproject.domain.order.service.dto.OrderResponse;
 import com.example.deliveryappproject.domain.policy.PointPolicy;
 import com.example.deliveryappproject.domain.store.entity.Store;
-import com.example.deliveryappproject.domain.store.repository.StoreRepository;
+import com.example.deliveryappproject.domain.store.service.StoreService;
 import com.example.deliveryappproject.domain.user.entity.User;
-import com.example.deliveryappproject.domain.user.repository.UserRepository;
+import com.example.deliveryappproject.domain.user.service.UserService;
 import com.example.deliveryappproject.domain.user.userpoint.PointHistoryRepository;
 import com.example.deliveryappproject.domain.user.userpoint.entity.PointHistory;
 import com.example.deliveryappproject.domain.user.userpoint.entity.PointType;
@@ -26,23 +28,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.example.deliveryappproject.domain.order.exception.ErrorMessages.MIN_ORDER_AMOUNT_REQUIRED;
+import static com.example.deliveryappproject.domain.order.exception.ErrorMessages.ORDER_NOT_AVAILABLE;
+import static com.example.deliveryappproject.domain.order.exception.ErrorMessages.ORDER_NOT_FOUND;
+import static com.example.deliveryappproject.domain.order.exception.ErrorMessages.ORDER_NOT_OWNER;
+import static com.example.deliveryappproject.domain.order.exception.ErrorMessages.ORDER_STATUS_NOT_PENDING;
+import static com.example.deliveryappproject.domain.order.exception.ErrorMessages.POINT_NOT_ENOUGH;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final CartRepository cartRepository;
-    private final StoreRepository storeRepository;
     private final MenuRepository menuRepository;
-    private final UserRepository userRepository;
     private final OrderRepository orderRepository;
-    private final PointPolicy pointPolicy;
     private final DeliveryRepository deliveryRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final PointPolicy pointPolicy;
+    private final StoreService storeService;
+    private final UserService userService;
 
 
     @Transactional
@@ -51,39 +59,31 @@ public class OrderService {
         Long storeId = cartRepository.findStoreId(userId);
 
         if (storeId == null) {
-            throw new BadRequestException("Cart is empty");
+            throw new NotFoundException("cart is empty");
         }
 
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new BadRequestException("store Not Found"));
+        Store store = storeService.findStoreByIdOrElseThrow(storeId);
 
-//        if (!store.isOrderAvailable()) {
-//            throw new BadRequestException("주문 가능한 시간이 아닙니다.");
-//        }
+        validateOrderAvailability(store);
 
-        //최소 주문 금액 검증
         List<CartItem> items = cartRepository.findItems(userId);
         List<Long> itemIds = items.stream()
                 .map(item -> item.getItemId())
                 .toList();
 
-        //임시
         List<Menu> menus = menuRepository.findAllById(itemIds);
         Map<Long, Menu> menuMap = menus.stream().collect(Collectors.toMap(Menu::getId, menu -> menu));
+
         BigDecimal totalPrice = calculateTotalPrice(menuMap, items);
 
-        if (totalPrice.compareTo(store.getMinOrderPrice()) < 0) {
-            throw new BadRequestException("최소주문 금액을 맞춰주세요");
-        }
+        validateMinOrderAmount(store, totalPrice);
+
 
         //포인트 사용 검증
-        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("User not found"));
-        int usePoints = orderRequest.getUsePoints();
+        User user = userService.findUserByIdOrElseThrow(userId);
+        validateUsePoints(user, orderRequest.getUsePoints());
 
-        if (usePoints > 0 && usePoints > user.getPoint()) {
-            throw new BadRequestException("포인트가 부족합니다.");
-        }
-        Order order = new Order(user, store, usePoints);
+        Order order = new Order(user, store, orderRequest.getUsePoints());
 
         convertAndAddOrderItems(order,menuMap, items);
 
@@ -96,34 +96,28 @@ public class OrderService {
 
         return OrderResponse.of(order.getId(),storeId, order.getOrderStatus());
 
-        // ✅ 최소 주문 금액 검증
+    }
 
+    private void validateUsePoints(User user, int usePoints) {
+        if (usePoints > 0 && usePoints > user.getPoint()) {
+            throw new ForbiddenException(POINT_NOT_ENOUGH);
+        }
     }
 
 
     @Transactional
     public OrderResponse acceptOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findByIdWithOrderItems(orderId).orElseThrow(() -> new BadRequestException("order not found"));
+        Order order = findByIdOrElseThrow(orderId);
 
-        if (order.getOrderStatus() != OrderStatus.PENDING) {
-            throw new BadRequestException("orderStatus is not pending");
-        }
+        validateStoreOwner(order, userId);
+        validateOrderStatusPending(order);
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("User not found"));
+        User user = userService.findUserByIdOrElseThrow(userId);
 
-        if (order.getUsedPoints() > 0) {
-            if(user.getPoint() < order.getUsedPoints()){
-                throw new BadRequestException("포인트가 부족합니다.");
-            }
-            user.usePoints(order.getUsedPoints());
-            pointHistoryRepository.save(new PointHistory(user, PointType.USE, order.getUsedPoints(),order.getId()));
+        validateUsePoints(user, order.getUsedPoints());
 
-        }else{
-            int calculateEarnedPoints = pointPolicy.calculateEarnedPoints(order.getTotalPrice());
-            user.addPoints(calculateEarnedPoints);
-            pointHistoryRepository.save(new PointHistory(user, PointType.EARN, calculateEarnedPoints,order.getId()));
+        handlePoints(order, user);
 
-        }
         order.acceptOrder();
 
         Delivery delivery = new Delivery(order);
@@ -134,35 +128,37 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse rejectOrder(Long orderId) {
-        Order order = orderRepository.findByIdWithOrderItems(orderId).orElseThrow(() -> new BadRequestException("order not found"));
+    public OrderResponse rejectOrder(Long userId, Long orderId) {
+        Order order = findByIdOrElseThrow(orderId);
 
-        if (order.getOrderStatus() != OrderStatus.PENDING) {
-            throw new BadRequestException("orderStatus is not pending");
-        }
+        validateStoreOwner(order, userId);
+        validateOrderStatusPending(order);
 
         order.rejectOrder();
 
         return OrderResponse.of(order.getId(),order.getStore().getId(), order.getOrderStatus());
     }
 
+
     @Transactional
     public OrderResponse cancelOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findByIdWithOrderItems(orderId).orElseThrow(() -> new BadRequestException("order not found"));
+        Order order = findByIdOrElseThrow(orderId);
 
-        if (order.getOrderStatus() != OrderStatus.PENDING) {
-            throw new BadRequestException("orderStatus is not pending");
-        }
+        validateOrderStatusPending(order);
+        validateOrderOwner(order, userId);
 
-        if (order.getUser() == null || !order.getUser().getId().equals(userId)) {
-            throw new BadRequestException("주문자가 아닙니다.");
-        }
 
         order.cancelOrder();
 
         return OrderResponse.of(order.getId(),order.getStore().getId(), order.getOrderStatus());
 
+    }
 
+
+    public OrderDetailResponse getOrder(Long orderId) {
+        Order order = orderRepository.findByIdWithStoreWithOrderItems(orderId).orElseThrow(() -> new NotFoundException(ORDER_NOT_FOUND));
+
+        return OrderDetailResponse.from(order);
     }
 
     private void convertAndAddOrderItems(Order order, Map<Long, Menu> menuMap, List<CartItem> items) {
@@ -175,7 +171,6 @@ public class OrderService {
             if (menu == null) {
                 throw new BadRequestException("menu not found: " + itemId);
             }
-
 
             BigDecimal menuTotalPrice = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
             OrderItem orderItem = OrderItem.createOrderItem(menu, menuTotalPrice, quantity);
@@ -191,8 +186,9 @@ public class OrderService {
             int quantity = item.getQuantity();
 
             Menu menu = menuMap.get(itemId);
+
             if (menu == null) {
-                throw new BadRequestException("menu not found: " + itemId);
+                throw new NotFoundException("menu not found: " + itemId);
             }
 
             BigDecimal menuTotalPrice = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
@@ -202,6 +198,63 @@ public class OrderService {
 
     }
 
+    private void validateMinOrderAmount(Store store, BigDecimal totalPrice) {
+        if (totalPrice.compareTo(store.getMinOrderPrice()) < 0) {
+            throw new ForbiddenException(MIN_ORDER_AMOUNT_REQUIRED);
+        }
+    }
+
+    private void validateOrderAvailability(Store store) {
+        if (!store.isOrderAvailable()) {
+            throw new ForbiddenException(ORDER_NOT_AVAILABLE);
+        }
+    }
+
+    private void handlePoints(Order order, User user) {
+        if (order.getUsedPoints() > 0) {
+            usePoints(order, user);
+        }else{
+            earnPoints(order, user);
+        }
+    }
+
+    private void earnPoints(Order order, User user) {
+        int calculateEarnedPoints = pointPolicy.calculateEarnedPoints(order.getTotalPrice());
+        user.addPoints(calculateEarnedPoints);
+        savePointHistory(user, PointType.EARN, calculateEarnedPoints, order);
+    }
 
 
+    private void usePoints(Order order, User user) {
+        user.usePoints(order.getUsedPoints());
+        savePointHistory(user, PointType.USE, order.getUsedPoints(), order);
+    }
+
+    private void savePointHistory(User user, PointType earn, int calculateEarnedPoints, Order order) {
+        pointHistoryRepository.save(new PointHistory(user, earn, calculateEarnedPoints, order.getId()));
+    }
+
+    private static void validateOrderStatusPending(Order order) {
+        if (!order.isPending()) {
+            throw new ForbiddenException(ORDER_STATUS_NOT_PENDING);
+        }
+    }
+
+    private Order findByIdOrElseThrow(Long orderId) {
+        return orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ORDER_NOT_FOUND));
+    }
+
+    private void validateStoreOwner(Order order, Long userId) {
+
+        Store store = order.getStore();
+        if (order.getStore() == null || !store.isOwner(userId)) {
+            throw new ForbiddenException("해당 주문에 대한 권한이 없습니다.");
+        }
+    }
+
+    private void validateOrderOwner(Order order, Long userId) {
+        if (!order.isOwner(userId)) {
+            throw new ForbiddenException(ORDER_NOT_OWNER);
+        }
+    }
 }

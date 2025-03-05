@@ -5,11 +5,13 @@ import com.example.deliveryappproject.common.annotation.AuthPermission;
 import com.example.deliveryappproject.common.dto.AuthUser;
 import com.example.deliveryappproject.common.response.Response;
 import com.example.deliveryappproject.config.aop.annotation.OrderLogging;
+import com.example.deliveryappproject.domain.order.dto.OrderDetailResponse;
 import com.example.deliveryappproject.domain.order.dto.OrderRequest;
 import com.example.deliveryappproject.domain.order.service.OrderService;
 import com.example.deliveryappproject.domain.order.service.dto.OrderResponse;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,35 +29,34 @@ public class OrderController {
     @OrderLogging
     @PostMapping
     public Response<OrderResponse> order(@Auth AuthUser authUser, @RequestBody OrderRequest orderRequest) {
-        OrderResponse orderResponse = orderService.order(authUser.getId(), orderRequest);
 
-        return Response.of(orderResponse);
+        return Response.of(orderService.order(authUser.getId(), orderRequest));
+    }
+
+    @GetMapping("/{orderId}")
+    public Response<OrderDetailResponse> getOrder(@PathVariable Long orderId) {
+        return Response.of(orderService.getOrder(orderId));
     }
 
     @OrderLogging
     @AuthPermission(role = UserRole.OWNER)
     @PatchMapping("/{orderId}/accept")
     public Response<OrderResponse> acceptOrder(@Auth AuthUser authUser, @PathVariable Long orderId) {
-        OrderResponse orderResponse = orderService.acceptOrder(authUser.getId(), orderId);
-
-
-        return Response.of(orderResponse);
+        return Response.of(orderService.acceptOrder(authUser.getId(), orderId));
     }
 
     @OrderLogging
     @AuthPermission(role = UserRole.OWNER)
     @PatchMapping("/{orderId}/reject")
     public Response<OrderResponse> rejectOrder(@Auth AuthUser authUser, @PathVariable Long orderId) {
-        OrderResponse orderResponse = orderService.rejectOrder(orderId);
 
-        return Response.of(orderResponse);
+        return Response.of(orderService.rejectOrder(authUser.getId(), orderId));
     }
 
     @OrderLogging
     @PatchMapping("/{orderId}/cancel")
     public Response<OrderResponse> cancelOrder(@Auth AuthUser authUser, @PathVariable Long orderId) {
-        OrderResponse orderResponse = orderService.cancelOrder(authUser.getId(), orderId);
-        
-        return Response.of(orderResponse);
+
+        return Response.of(orderService.cancelOrder(authUser.getId(), orderId));
     }
 }

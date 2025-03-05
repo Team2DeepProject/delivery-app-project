@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.Objects;
 
 import static jakarta.persistence.EnumType.STRING;
 
@@ -79,4 +80,8 @@ public class Store extends Timestamped {
         return !now.isBefore(openAt) && !now.isAfter(closeAt);
     }
 
+
+    public boolean isOwner(Long userId) {
+        return this.user != null && Objects.equals(this.user.getId(), userId);
+    }
 }
