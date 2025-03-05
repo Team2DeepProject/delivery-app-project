@@ -12,6 +12,7 @@ import com.example.deliveryappproject.domain.review.repository.ReviewRepository;
 import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,11 +24,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
@@ -44,18 +44,33 @@ class CommentServiceTest {
     @Captor
     private ArgumentCaptor<Comment> commentCaptor;
 
-    @Test
-    void 사장님만_댓글을_달수_있다() throws NoSuchFieldException, IllegalAccessException {
-        // Given
-        Long reviewId = 1L;
-        Long storeId = 1L;
+    private User owner;
+    private User user;
+    private Store store;
+    private Review review;
+
+    @BeforeEach
+    void setUp() {
         Long ownerId = 1L;
+        Long userId = 2L;
+        Long storeId = 1L;
 
-        // 사장님 사용자 생성 및 역할 설정
-        User owner = new User(ownerId);
-        owner.updateUserRole(UserRole.OWNER);
-        AuthUser authUser = new AuthUser(ownerId, "owner@example.com", UserRole.OWNER);
+        // 기본 사장님과 일반 사용자 생성
+        owner = createUser(ownerId, UserRole.OWNER);
+        user = createUser(userId, UserRole.USER);
 
+        // 가게, 리뷰 객체 생성
+        store = createStore(owner, storeId);
+        review = createReview(store, owner);
+    }
+
+    private User createUser(Long userId, UserRole role) {
+        User newUser = new User(userId);
+        newUser.updateUserRole(role);
+        return newUser;
+    }
+
+    private Store createStore(User owner, Long storeId) {
         Store store = Store.builder()
                 .user(owner)
                 .storeName("Test Store")
@@ -63,26 +78,36 @@ class CommentServiceTest {
                 .closeAt(LocalTime.of(21, 0))
                 .minOrderPrice(BigDecimal.valueOf(10000))
                 .build();
+        try {
+            store.getClass().getDeclaredField("id").set(store, storeId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return store;
+    }
 
-        store.getClass().getDeclaredField("id").set(store, storeId);
-
-        Review review = Review.builder()
-                .store(store)   // Store 객체 설정
-                .user(owner)     // owner가 리뷰 작성자
-                .content("맛있어요.")  // 리뷰 내용
-                .rating(5)       // 별점
+    private Review createReview(Store store, User owner) {
+        return Review.builder()
+                .store(store)
+                .user(owner)
+                .content("맛있어요.")
+                .rating(5)
                 .build();
+    }
 
-        CommentRequest commentRequest = new CommentRequest();
-        commentRequest.updateContent("댓글 내용");
+    @Test
+    void 사장님만_댓글을_달수_있다() {
+        // Given
+        Long reviewId = 1L;
+        AuthUser authUser = new AuthUser(owner.getId(), "owner@example.com", UserRole.OWNER);
+        CommentRequest commentRequest = createCommentRequest("댓글 내용");
 
-        // given: reviewId에 해당하는 리뷰가 존재하도록 설정
         given(reviewRepository.findById(reviewId)).willReturn(java.util.Optional.of(review));
 
         // When
         commentService.createComment(authUser, reviewId, commentRequest);
 
-        // Then: save()가 호출되었는지 확인하고, 저장된 Comment 객체를 캡처하여 검증
+        // Then
         verify(commentRepository, times(1)).save(commentCaptor.capture());
         Comment savedComment = commentCaptor.getValue();
         assertNotNull(savedComment);
@@ -93,39 +118,9 @@ class CommentServiceTest {
     void 사장님이_아닌_사용자는_댓글을_달수_없다() {
         // Given
         Long reviewId = 1L;
-        Long storeId = 1L;
-        Long userId = 2L;  // 사장님이 아닌 사용자
+        AuthUser authUser = new AuthUser(user.getId(), "user@example.com", UserRole.USER);
+        CommentRequest commentRequest = createCommentRequest("댓글 내용");
 
-        // 일반 사용자 생성 및 역할 설정
-        User user = new User(userId);
-        user.updateUserRole(UserRole.USER); // 역할 설정
-        AuthUser authUser = new AuthUser(userId, "user@example.com", UserRole.USER);
-
-        // 사장님 사용자 생성 및 역할 설정 (리뷰를 작성한 사장님)
-        Long ownerId = 1L;
-        User owner = new User(ownerId);
-        owner.updateUserRole(UserRole.OWNER); // 역할 설정
-
-        Store store = Store.builder()
-                .user(owner)  // 실제 사장님이 소유한 가게
-                .storeName("Test Store")
-                .openAt(LocalTime.of(9, 0))
-                .closeAt(LocalTime.of(21, 0))
-                .minOrderPrice(BigDecimal.valueOf(10000))
-                .build();
-
-        // 리뷰 생성 (사장님이 작성한 리뷰)
-        Review review = Review.builder()
-                .store(store)   // Store 객체 설정
-                .user(owner)    // 리뷰 작성자(사장님)
-                .content("맛있어요.")  // 리뷰 내용
-                .rating(5)       // 별점
-                .build();
-
-        CommentRequest commentRequest = new CommentRequest();
-        commentRequest.updateContent("댓글 내용");
-
-        // given: reviewId에 해당하는 리뷰가 존재하도록 설정
         given(reviewRepository.findById(reviewId)).willReturn(java.util.Optional.of(review));
 
         // When & Then
@@ -135,43 +130,16 @@ class CommentServiceTest {
         verify(commentRepository, never()).save(commentCaptor.capture());
     }
 
-
     @Test
     void 사장님이_댓글을_이미_달았으면_다시_달수_없다() {
         // Given
         Long reviewId = 1L;
-        Long storeId = 1L;
-        Long ownerId = 1L;
+        AuthUser authUser = new AuthUser(owner.getId(), "owner@example.com", UserRole.OWNER);
+        CommentRequest commentRequest = createCommentRequest("댓글 내용");
 
-        // 사장님 사용자 생성 및 역할 설정
-        User owner = new User(ownerId);
-        owner.updateUserRole(UserRole.OWNER);
-        AuthUser authUser = new AuthUser(ownerId, "owner@example.com", UserRole.OWNER);
-
-        // Store 객체 생성
-        Store store = Store.builder()
-                .user(owner)
-                .storeName("Test Store")
-                .openAt(LocalTime.of(9, 0))
-                .closeAt(LocalTime.of(21, 0))
-                .minOrderPrice(BigDecimal.valueOf(10000))
-                .build();
-
-        // 리뷰 생성
-        Review review = Review.builder()
-                .store(store)
-                .user(owner)
-                .content("맛있어요.")
-                .rating(5)
-                .build();
-
-        // 댓글이 이미 존재한다고 설정
         given(reviewRepository.findById(reviewId)).willReturn(java.util.Optional.of(review));
-        given(commentRepository.existsByReviewAndUserIdAndUserRole(review, ownerId, UserRole.OWNER))
+        given(commentRepository.existsByReviewAndUserIdAndUserRole(review, owner.getId(), UserRole.OWNER))
                 .willReturn(true);  // 이미 댓글이 존재
-
-        CommentRequest commentRequest = new CommentRequest();
-        commentRequest.updateContent("댓글 내용");
 
         // When & Then
         BadRequestException exception = assertThrows(BadRequestException.class,
@@ -184,84 +152,46 @@ class CommentServiceTest {
     void 사장님_댓글_조회_테스트() {
         // Given
         Long reviewId = 1L;
-        Long ownerId = 1L;
-        Long userId = 1L;
+        AuthUser authUser = new AuthUser(owner.getId(), "owner@example.com", UserRole.OWNER);
 
-        // 사장님 사용자 생성 및 역할 설정
-        User owner = new User(ownerId);
-        owner.updateUserRole(UserRole.OWNER);
-        AuthUser authUser = new AuthUser(userId, "owner@example.com", UserRole.OWNER);
-
-        // Store 객체 생성
-        Store store = Store.builder()
-                .user(owner)
-                .storeName("Test Store")
-                .openAt(LocalTime.of(9, 0))
-                .closeAt(LocalTime.of(21, 0))
-                .minOrderPrice(BigDecimal.valueOf(10000))
-                .build();
-
-        // 리뷰 생성
-        Review review = Review.builder()
-                .store(store)
-                .user(owner)
-                .content("맛있어요.")
-                .rating(5)
-                .build();
-
-        // 댓글 생성
-        Comment comment = Comment.builder()
-                .user(owner)
-                .review(review)
-                .content("댓글 내용")
-                .build();
-
-        // given: reviewId에 해당하는 리뷰와 댓글이 존재하도록 설정
         given(reviewRepository.findById(reviewId)).willReturn(java.util.Optional.of(review));
-        given(commentRepository.findByReviewAndUserId(review, ownerId))
-                .willReturn(java.util.Optional.of(comment));
+        given(commentRepository.findByReviewAndUserId(review, owner.getId()))
+                .willReturn(java.util.Optional.of(createComment(owner, review)));
 
         // When
-        CommentResponse response = commentService.getOwnerComment(reviewId, ownerId);
+        CommentResponse response = commentService.getOwnerComment(reviewId, owner.getId());
 
         // Then
         assertNotNull(response);
-        assertEquals(ownerId, response.getUserId());
+        assertEquals(owner.getId(), response.getUserId());
     }
 
     @Test
     void 사장님_댓글_조회_권한없을때() {
         // Given
         Long reviewId = 1L;
-        Long storeId = 1L;
         Long userId = 2L;  // 다른 사용자
+        AuthUser authUser = new AuthUser(userId, "user@example.com", UserRole.USER);
 
-        // 사장님이 아닌 사용자 생성
-        User owner = new User(userId);
-
-        // Store 객체 생성
-        Store store = Store.builder()
-                .user(owner)
-                .storeName("Test Store")
-                .openAt(LocalTime.of(9, 0))
-                .closeAt(LocalTime.of(21, 0))
-                .minOrderPrice(BigDecimal.valueOf(10000))
-                .build();
-
-        // 리뷰 생성
-        Review review = Review.builder()
-                .store(store)
-                .user(owner)
-                .content("맛있어요.")
-                .rating(5)
-                .build();
-
-        // given: reviewId에 해당하는 리뷰가 존재하도록 설정
         given(reviewRepository.findById(reviewId)).willReturn(java.util.Optional.of(review));
 
         // When & Then
         BadRequestException exception = assertThrows(BadRequestException.class,
                 () -> commentService.getOwnerComment(reviewId, userId));
         assertEquals("이 리뷰에 대한 사장님의 댓글을 조회할 권한이 없습니다.", exception.getMessage());
+    }
+
+    private CommentRequest createCommentRequest(String content) {
+        CommentRequest commentRequest = new CommentRequest();
+        commentRequest.updateContent(content);
+        return commentRequest;
+    }
+
+    private Comment createComment(User user, Review review) {
+        return Comment.builder()
+                .user(user)
+                .review(review)
+                .content("댓글 내용")
+                .build();
     }
 }
