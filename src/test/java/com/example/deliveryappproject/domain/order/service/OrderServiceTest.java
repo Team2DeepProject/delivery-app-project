@@ -106,7 +106,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             OrderRequest orderRequest = new OrderRequest();
-            Store store = new Store(1L, "한식가게", LocalTime.of(20, 0), LocalTime.of(21, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(0, 1), BigDecimal.valueOf(20000));
             given(cartRepository.findStoreId(any(Long.class))).willReturn(1L);
             given(storeService.findStoreByIdOrElseThrow(any(Long.class))).willReturn(store);
             //when & then
@@ -119,7 +119,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             OrderRequest orderRequest = new OrderRequest();
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             List<CartItem> items = List.of(
                     new CartItem(1L, 1),
                     new CartItem(2L, 2),
@@ -147,7 +147,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             OrderRequest orderRequest = new OrderRequest();
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             List<CartItem> items = List.of(
                     new CartItem(1L, 1),
                     new CartItem(2L, 2),
@@ -178,7 +178,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             OrderRequest orderRequest = new OrderRequest();
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             List<CartItem> items = List.of(
                     new CartItem(1L, 1),
                     new CartItem(2L, 2),
@@ -210,7 +210,7 @@ class OrderServiceTest {
             Long userId = 1L;
             OrderRequest orderRequest = new OrderRequest();
             ReflectionTestUtils.setField(orderRequest,"usePoints", 10);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             List<CartItem> items = List.of(
                     new CartItem(1L, 1),
                     new CartItem(2L, 2),
@@ -244,7 +244,7 @@ class OrderServiceTest {
             Long userId = 1L;
             OrderRequest orderRequest = new OrderRequest();
 //            ReflectionTestUtils.setField(orderRequest,"usePoints", 10);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             List<CartItem> items = List.of(
                     new CartItem(1L, 1),
                     new CartItem(2L, 2),
@@ -280,7 +280,7 @@ class OrderServiceTest {
             Long userId = 1L;
             OrderRequest orderRequest = new OrderRequest();
             ReflectionTestUtils.setField(orderRequest,"usePoints", 10);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             List<CartItem> items = List.of(
                     new CartItem(1L, 1),
                     new CartItem(2L, 2),
@@ -331,7 +331,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             Long orderId = 1L;
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,100);
             order.cancelOrder();
@@ -349,7 +349,7 @@ class OrderServiceTest {
             Long orderId = 1L;
             User owner = new User("asd2@asd.com","1q2w3e4r!","mock", UserRole.OWNER);
             ReflectionTestUtils.setField(owner,"id",1L);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             ReflectionTestUtils.setField(store,"user",owner);
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,100);
@@ -368,7 +368,7 @@ class OrderServiceTest {
             Long orderId = 1L;
             User owner = new User("asd2@asd.com","1q2w3e4r!","mock", UserRole.OWNER);
             ReflectionTestUtils.setField(owner,"id",1L);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             ReflectionTestUtils.setField(store,"user",owner);
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,100);
@@ -386,7 +386,7 @@ class OrderServiceTest {
             Long orderId = 1L;
             User owner = new User("asd2@asd.com","1q2w3e4r!","mock", UserRole.OWNER);
             ReflectionTestUtils.setField(owner,"id",1L);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             ReflectionTestUtils.setField(store,"user",owner);
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,100);
@@ -405,7 +405,7 @@ class OrderServiceTest {
             Long orderId = 1L;
             User owner = new User("asd2@asd.com","1q2w3e4r!","mock", UserRole.OWNER);
             ReflectionTestUtils.setField(owner,"id",1L);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             ReflectionTestUtils.setField(store,"user",owner);
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             ReflectionTestUtils.setField(user,"point",100);
@@ -429,7 +429,7 @@ class OrderServiceTest {
             Long orderId = 1L;
             User owner = new User("asd2@asd.com","1q2w3e4r!","mock", UserRole.OWNER);
             ReflectionTestUtils.setField(owner,"id",1L);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             ReflectionTestUtils.setField(store,"user",owner);
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,0);
@@ -468,7 +468,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             Long orderId = 1L;
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,100);
             order.cancelOrder();
@@ -486,7 +486,7 @@ class OrderServiceTest {
             Long orderId = 1L;
             User owner = new User("asd2@asd.com","1q2w3e4r!","mock", UserRole.OWNER);
             ReflectionTestUtils.setField(owner,"id",1L);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             ReflectionTestUtils.setField(store,"user",owner);
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,100);
@@ -504,7 +504,7 @@ class OrderServiceTest {
             Long orderId = 1L;
             User owner = new User("asd2@asd.com","1q2w3e4r!","mock", UserRole.OWNER);
             ReflectionTestUtils.setField(owner,"id",1L);
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             ReflectionTestUtils.setField(store,"user",owner);
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,0);
@@ -536,7 +536,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             Long orderId = 1L;
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             Order order = new Order(user,store,100);
             order.cancelOrder();
@@ -552,7 +552,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             Long orderId = 1L;
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             ReflectionTestUtils.setField(user,"id",2L);
             Order order = new Order(user,store,0);
@@ -569,7 +569,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             Long orderId = 1L;
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             ReflectionTestUtils.setField(user,"id",1L);
             Order order = new Order(user,store,0);
@@ -601,7 +601,7 @@ class OrderServiceTest {
             //given
             Long userId = 1L;
             Long orderId = 1L;
-            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 0), BigDecimal.valueOf(20000));
+            Store store = new Store(1L, "한식가게", LocalTime.of(0, 0), LocalTime.of(23, 59), BigDecimal.valueOf(20000));
             User user = new User("asd@asd.com","1q2w3e4r!","mock", UserRole.USER);
             ReflectionTestUtils.setField(user,"id",1L);
             Order order = new Order(user,store,0);

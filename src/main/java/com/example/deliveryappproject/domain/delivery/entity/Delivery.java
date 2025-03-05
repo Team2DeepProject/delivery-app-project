@@ -14,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,17 +32,23 @@ public class Delivery {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
+    private Long deliveryUserId;
+
     public Delivery(Order order) {
         this.order = order;
         this.deliveryStatus = DeliveryStatus.PENDING;
     }
 
-    public void startDelivery() {
+    public void startDelivery(Long userId) {
+        this.deliveryUserId = userId;
         this.deliveryStatus = DeliveryStatus.READY;
     }
 
     public void completeDelivery() {
-
         this.deliveryStatus = DeliveryStatus.COMP;
+    }
+
+    public boolean isAssignedTo(Long userId) {
+        return this.deliveryUserId != null && Objects.equals(deliveryUserId, userId);
     }
 }

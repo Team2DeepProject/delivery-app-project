@@ -1,6 +1,7 @@
 package com.example.deliveryappproject.domain.delivery.service;
 
 import com.example.deliveryappproject.common.exception.BadRequestException;
+import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.domain.delivery.dto.DeliveryResponse;
 import com.example.deliveryappproject.domain.delivery.entity.Delivery;
@@ -19,30 +20,38 @@ public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
 
     @Transactional
-    public void startDelivery(Long deliveryId) {
+    public void startDelivery(Long userId, Long deliveryId) {
         Delivery delivery = findByIdOrElseThrow(deliveryId);
-        if (delivery.getDeliveryStatus() != DeliveryStatus.PENDING) {
-            throw new BadRequestException("Delivery is not pending");
-        }
-
-        delivery.startDelivery();
-    }
-
-    @Transactional
-    public DeliveryResponse completeDelivery(Long deliveryId) {
-
-        Delivery delivery = findByIdOrElseThrow(deliveryId);
-        if (delivery.getDeliveryStatus() != DeliveryStatus.READY) {
-            throw new BadRequestException("Delivery is not ready");
-        }
-
-        delivery.completeDelivery();
 
         Order order = delivery.getOrder();
 
         if (order.getOrderStatus() != OrderStatus.ACCEPT) {
             throw new BadRequestException("Order is not accept");
         }
+
+        if (delivery.getDeliveryStatus() != DeliveryStatus.PENDING) {
+            throw new BadRequestException("Delivery is not pending");
+        }
+
+        delivery.startDelivery(userId);
+    }
+
+    @Transactional
+    public DeliveryResponse completeDelivery(Long userId, Long deliveryId) {
+
+        Delivery delivery = findByIdOrElseThrow(deliveryId);
+        if (delivery.getDeliveryStatus() != DeliveryStatus.READY) {
+            throw new BadRequestException("Delivery is not ready");
+        }
+
+        if (!delivery.isAssignedTo(userId)) {
+            throw new ForbiddenException("해당 배송을 맡은 유저가 아닙니다.");
+        }
+
+
+        delivery.completeDelivery();
+
+        Order order = delivery.getOrder();
 
         order.completeOrder();
 
