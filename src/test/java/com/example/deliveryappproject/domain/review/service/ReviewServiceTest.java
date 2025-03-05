@@ -54,7 +54,7 @@ public class ReviewServiceTest {
     void setUp() {
         // 공통 객체 설정
         authUser = new AuthUser(1L, "email@email.com", UserRole.USER);
-        user = new User("email@email.com", "password", "홍길동", UserRole.USER);
+        user = new User(1L, "email@email.com", "password", "홍길동", UserRole.USER);
         store = new Store(user, "한식가게", LocalTime.of(10, 0), LocalTime.of(22, 0), BigDecimal.valueOf(10000));
 
         review = Review.builder()
@@ -111,6 +111,11 @@ public class ReviewServiceTest {
         // given
         AuthUser anotherUser = new AuthUser(2L, "anotherEmail@email.com", UserRole.USER);
         ReviewUpdateRequest updateRequest = new ReviewUpdateRequest("더 맛있어요", 4);
+
+        // 리뷰 객체에 user가 설정되었는지 확인
+        assertNotNull(review.getUser(), "Review의 user가 null입니다.");
+        assertNotNull(review.getUser().getId(), "Review의 user ID가 null입니다.");
+
         given(reviewRepository.findById(1L)).willReturn(Optional.of(review));
 
         // when & then
@@ -118,6 +123,7 @@ public class ReviewServiceTest {
                 () -> reviewService.updateReview(anotherUser, 1L, updateRequest),
                 "본인의 리뷰만 수정할 수 있습니다.");
     }
+
 
     /* deleteReview */
     @Test

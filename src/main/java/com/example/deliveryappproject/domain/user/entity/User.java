@@ -49,6 +49,14 @@ public class User extends Timestamped { // Timestamped 추가
         this.userState=UserState.ACTIVE;
     }
 
+    public User(Long id, String email, String password, String userName, UserRole userRole) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.userName = userName;
+        this.userRole = userRole;
+    }
+
     public void update(String userName){
         this.userName=userName;
     }
