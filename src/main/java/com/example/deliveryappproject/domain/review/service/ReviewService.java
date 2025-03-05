@@ -15,6 +15,7 @@ import com.example.deliveryappproject.domain.user.entity.User;
 import com.example.deliveryappproject.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,12 +31,17 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ReviewResponse createReview(AuthUser authUser, Long storeId, ReviewCreateRequest request) {
+    public ResponseEntity<Void> createReview(AuthUser authUser, Long storeId, ReviewCreateRequest request) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException("가게를 찾을 수 없습니다."));
 
         User user = userRepository.findById(authUser.getId())
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
+
+        boolean existingReview = reviewRepository.existsByStoreIdAndUserId(storeId, user.getId());
+        if (existingReview) {
+            throw new BadRequestException("한 가게에 하나의 리뷰만 작성할 수 있습니다.");
+        }
 
         Review review = Review.builder()
                 .store(store)
@@ -46,8 +52,9 @@ public class ReviewService {
 
         reviewRepository.save(review);
 
-        return new ReviewResponse(review);
+        return ResponseEntity.ok().build();  // 성공적으로 저장된 후 200 OK 상태 코드 반환
     }
+
 
     @Transactional(readOnly = true)
     public List<ReviewResponse> getReviews(Long storeId) {
