@@ -68,4 +68,10 @@ public class Store extends Timestamped {
         this.minOrderPrice = minOrderPrice;
     }
 
+    public boolean isOrderAvailable() {
+        LocalTime now = LocalTime.now();
+
+        return !now.isBefore(openAt) && !now.isAfter(closeAt);
+    }
+
 }
