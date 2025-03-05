@@ -21,7 +21,6 @@ public abstract class RedisKeyUtil {
     }
 
     public static Long extractItemId(String key) {
-        System.out.println(key);
         return Long.parseLong(key.substring(ITEM_PREFIX.length()));
     }
 }
