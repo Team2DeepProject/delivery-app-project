@@ -96,20 +96,17 @@ public class UserService {
         user.setUserState(UserState.DELETE);
     }
 
+    //이메일 없으면 예외처리
     @Transactional(readOnly = true)
     public User findUserByEmailOrElseThrow(String email) {
         return userRepository.findByEmail(email).orElseThrow(
                 () -> new NotFoundException("Not Found Email"));
     }
 
+    //사용자 없으면 예외처리
     @Transactional(readOnly = true)
     public User findUserByIdOrElseThrow(Long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Not Found UserId"));
     }
-
-//    public User getUserById(Long userId) {
-//        return userRepository.findById(userId).orElseThrow(
-//                () -> new NotFoundException("Not Found UserId"));
-//    }
 }
