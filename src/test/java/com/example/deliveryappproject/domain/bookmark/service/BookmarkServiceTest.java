@@ -1,6 +1,5 @@
 package com.example.deliveryappproject.domain.bookmark.service;
 
-import com.example.deliveryappproject.common.response.Response;
 import com.example.deliveryappproject.domain.bookmark.dto.response.BookmarkResponseDto;
 import com.example.deliveryappproject.domain.bookmark.entity.Bookmark;
 import com.example.deliveryappproject.domain.bookmark.repository.BookmarkRepository;
