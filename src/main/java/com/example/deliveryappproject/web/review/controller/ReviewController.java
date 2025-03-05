@@ -11,6 +11,7 @@ import com.example.deliveryappproject.domain.review.service.ReviewService;
 import com.example.deliveryappproject.domain.user.enums.UserRole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,12 +25,13 @@ public class ReviewController {
 
     @AuthPermission(role = UserRole.USER)
     @PostMapping
-    public ReviewResponse createReview(
+    public ResponseEntity<Void> createReview(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @Valid @RequestBody ReviewCreateRequest request
     ) {
-        return reviewService.createReview(authUser, storeId, request);
+        reviewService.createReview(authUser, storeId, request);
+        return ResponseEntity.ok().build();  // 성공적으로 저장된 후 200 OK 상태 코드 반환
     }
 
     @GetMapping
