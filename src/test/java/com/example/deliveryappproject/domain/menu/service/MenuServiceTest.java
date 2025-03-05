@@ -69,6 +69,8 @@ public class MenuServiceTest {
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(mockUser));
 
+        given(storeRepository.existsById(anyLong())).willReturn(true);
+
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(mockStore));
 
         Menu menu = new Menu("menuName", price, "information", mockStore);
@@ -83,9 +85,9 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 메뉴_생성시_유저가_존재하지_않으면_에러가_발생한다(){
+    void 메뉴_생성시_유저가_존재하지_않으면_에러가_발생한다() {
         //given
-        MenuRequest request = new MenuRequest("menuName",  BigDecimal.valueOf(10000), "information");
+        MenuRequest request = new MenuRequest("menuName", BigDecimal.valueOf(10000), "information");
 
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -98,14 +100,34 @@ public class MenuServiceTest {
     }
 
     @Test
+    void 메뉴_생성시_가게가_존재하지_않으면_에러가_발생한다() {
+        //given
+        MenuRequest request = new MenuRequest("menuName", BigDecimal.valueOf(10000), "information");
+        User mockUser = mock(User.class);
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(mockUser));
+        given(storeRepository.existsById(anyLong())).willReturn(false);
+
+        //when
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                menuService.saveMenu(1L, 1L, request));
+
+        //then
+        assertEquals("Not Found storeId", exception.getMessage());
+
+    }
+
+    @Test
     void 메뉴_생성시_동일한_메뉴를_추가하면_에러가_발생한다() {
         // given
         long userId = 1L;
         long storeId = 1L;
         BigDecimal price = BigDecimal.valueOf(10000);
-        User mockUser= mock(User.class);
+        User mockUser = mock(User.class);
 
         MenuRequest request = new MenuRequest("menuName", price, "information");
+
+        given(storeRepository.existsById(anyLong())).willReturn(true);
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(mockUser));
 
@@ -167,7 +189,7 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 메뉴_단건조회시_찾는_메뉴가_없으면_에러가_발생한다(){
+    void 메뉴_단건조회시_찾는_메뉴가_없으면_에러가_발생한다() {
         //given
         given(menuRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -216,7 +238,7 @@ public class MenuServiceTest {
 
         //when
         NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                menuService.findByStoreId(1,10,1L));
+                menuService.findByStoreId(1, 10, 1L));
 
         //then
         assertEquals("Not Found storeId", exception.getMessage());
@@ -242,16 +264,17 @@ public class MenuServiceTest {
 
         given(menuRepository.findById(anyLong())).willReturn(Optional.of(menu));
 
-        menu.update("menuName2" , price, "information2");
+        menu.update("menuName2", price, "information2");
 
         // when
-         menuService.updateMenu(userId, menuId, request);
+        menuService.updateMenu(userId, menuId, request);
 
         // then
         assertEquals("menuName2", menu.getMenuName());
         assertEquals("information2", menu.getInformation());
 
-        }
+    }
+
     @Test
     void 메뉴_수정시_찾는_유저가_없으면_에러가_발생한다() {
         //given
@@ -260,7 +283,7 @@ public class MenuServiceTest {
 
         //when
         NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                menuService.updateMenu(1L,1L,request));
+                menuService.updateMenu(1L, 1L, request));
 
         //then
         assertEquals("Not Found userId", exception.getMessage());
@@ -271,13 +294,13 @@ public class MenuServiceTest {
         //given
         MenuRequest request = new MenuRequest("menuName2", BigDecimal.valueOf(10000), "information2");
 
-        User mockUser= mock(User.class);
+        User mockUser = mock(User.class);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(mockUser));
         given(menuRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
         NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                menuService.updateMenu(1L,1L, request));
+                menuService.updateMenu(1L, 1L, request));
 
         //then
         assertEquals("Not Found menuId", exception.getMessage());
@@ -313,7 +336,7 @@ public class MenuServiceTest {
 
         //when
         NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                menuService.deleteMenu(1L,1L));
+                menuService.deleteMenu(1L, 1L));
 
         //then
         assertEquals("Not Found userId", exception.getMessage());
@@ -322,13 +345,13 @@ public class MenuServiceTest {
     @Test
     void 메뉴_삭제시_찾는_메뉴가_없으면_에러가_발생한다() {
         //given
-        User mockUser= mock(User.class);
+        User mockUser = mock(User.class);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(mockUser));
         given(menuRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
         NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                menuService.deleteMenu(1L,1L));
+                menuService.deleteMenu(1L, 1L));
 
         //then
         assertEquals("Not Found MenuId", exception.getMessage());
@@ -342,13 +365,13 @@ public class MenuServiceTest {
         BigDecimal price = BigDecimal.valueOf(10000);
         LocalTime time = LocalTime.of(9, 30, 30);
 
-        User mockUser= mock(User.class);
+        User mockUser = mock(User.class);
         Store store = new Store(mockUser, "storeName", time, time, price);
         Store store2 = new Store(mockUser, "storeName2", time, time, price);
 
         Menu menu = new Menu("menuName", price, "information", store);
 
-        Menu mockMenu= mock(Menu.class);
+        Menu mockMenu = mock(Menu.class);
         List<Store> stores = Lists.newArrayList(store2);//1개짜리 store List.
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(mockUser));
@@ -361,4 +384,31 @@ public class MenuServiceTest {
 
     }
 
+    @Test
+    void 메뉴_삭제시_가게비교_후_MenuState가_그대로라면_에러가_발생한다() {
+        long userId = 1L;
+        long menuId = 1L;
+        BigDecimal price = BigDecimal.valueOf(10000);
+        LocalTime time = LocalTime.of(9, 30, 30);
+
+        User mockUser = mock(User.class);
+        Store store = new Store(mockUser, "storeName", time, time, price);
+        Store store2 = new Store(mockUser, "storeName2", time, time, price);
+
+        Menu menu = new Menu("menuName", price, "information", store);
+
+        List<Store> stores = Lists.newArrayList(store2);//1개짜리 store List.
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(mockUser));
+        given(menuRepository.findById(anyLong())).willReturn(Optional.of(menu));
+        given(storeRepository.findByUserId(anyLong())).willReturn(stores);
+
+        //when
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+                menuService.deleteMenu(1L, 1L));
+
+        //then
+        assertEquals("소유한 가게를 입력해주세요.", exception.getMessage());
+
+    }
 }
