@@ -36,6 +36,9 @@ public class MenuService {
         userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Not Found UserId"));
 
+        if (!storeRepository.existsById(storeId))
+            throw new NotFoundException("Not Found storeId");
+
         if (menuRepository.existsByMenuNameAndStoreId(dto.getMenuName(), storeId)) {
             throw new BadRequestException("동일메뉴는 불가능합니다.");
         }
@@ -131,5 +134,8 @@ public class MenuService {
             if (ObjectUtils.nullSafeEquals(userStore, menuStore))//  객체 비교에는 equals
                 menu.setMenuState(MenuState.DELETE);
         }
+
+        if(menu.getMenuState()==MenuState.SALE)
+            throw new BadRequestException("소유한 가게를 입력해주세요.");
     }
 }
