@@ -159,7 +159,7 @@ class CommentServiceTest {
                 .willReturn(java.util.Optional.of(createComment(owner, review)));
 
         // When
-        CommentResponse response = commentService.getOwnerComment(reviewId, owner.getId());
+        CommentResponse response = commentService.getOwnerComment(reviewId);
 
         // Then
         assertNotNull(response);
@@ -177,7 +177,7 @@ class CommentServiceTest {
 
         // When & Then
         BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> commentService.getOwnerComment(reviewId, userId));
+                () -> commentService.getOwnerComment(reviewId));
         assertEquals("이 리뷰에 대한 사장님의 댓글을 조회할 권한이 없습니다.", exception.getMessage());
     }
 

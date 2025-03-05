@@ -53,21 +53,20 @@ public class CommentService {
 
     // 사장님 댓글 조회
     @Transactional
-    public CommentResponse getOwnerComment(Long reviewId, Long userId) {
+    public CommentResponse getOwnerComment(Long reviewId) {
+        // 리뷰 찾기
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BadRequestException("리뷰를 찾을 수 없습니다."));
 
+        // 리뷰에 속한 가게의 사장님 정보
         Store store = review.getStore();
         User owner = store.getUser();  // EAGER 로딩
 
-        if (owner.getId().equals(userId)) {
-            Comment comment = commentRepository.findByReviewAndUserId(review, userId)
-                    .orElseThrow(() -> new BadRequestException("사장님의 댓글을 찾을 수 없습니다."));
+        // 로그인된 사장님 정보를 통해 댓글 조회
+        Comment comment = commentRepository.findByReviewAndUser(review, owner)
+                .orElseThrow(() -> new BadRequestException("사장님의 댓글을 찾을 수 없습니다."));
 
-            return new CommentResponse(comment);
-        } else {
-            throw new BadRequestException("이 리뷰에 대한 사장님의 댓글을 조회할 권한이 없습니다.");
-        }
+        return new CommentResponse(comment);
     }
 
     // 댓글 수정
