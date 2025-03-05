@@ -65,18 +65,6 @@ public class UserService {
         return users;
     }
 
-    @Transactional(readOnly = true)
-    public User findUserByEmailOrElseThrow(String email) {
-        return userRepository.findByEmail(email).orElseThrow(
-                () -> new NotFoundException("Not Found Email"));
-    }
-
-    @Transactional(readOnly = true)
-    public User findUserByIdOrElseThrow(Long id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Not Found UserId"));
-    }
-
     //로그인한 회원 정보 조회
     @Transactional(readOnly = true)
     public UserResponse fetchProfile(Long id) {
@@ -108,8 +96,20 @@ public class UserService {
         user.setUserState(UserState.DELETE);
     }
 
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
+    @Transactional(readOnly = true)
+    public User findUserByEmailOrElseThrow(String email) {
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new NotFoundException("Not Found Email"));
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserByIdOrElseThrow(Long id) {
+        return userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Not Found UserId"));
     }
+
+//    public User getUserById(Long userId) {
+//        return userRepository.findById(userId).orElseThrow(
+//                () -> new NotFoundException("Not Found UserId"));
+//    }
 }

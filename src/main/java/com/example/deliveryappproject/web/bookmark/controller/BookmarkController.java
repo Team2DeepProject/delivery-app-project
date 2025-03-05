@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.domain.bookmark.controller;
+package com.example.deliveryappproject.web.bookmark.controller;
 
 import com.example.deliveryappproject.common.annotation.Auth;
 import com.example.deliveryappproject.common.dto.AuthUser;

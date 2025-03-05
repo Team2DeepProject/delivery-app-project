@@ -44,7 +44,7 @@ public class MenuService {
 
         Menu menu = new Menu(dto.getMenuName(), dto.getPrice(), dto.getInformation(), store.get());
 
-        Menu savedMenu = menuRepository.save(menu);
+        menuRepository.save(menu);
 
     }
 
@@ -82,7 +82,7 @@ public class MenuService {
     @Transactional(readOnly = true)
     public Page<MenuResponse> findByStoreId(int page, int size, Long storeId) {
         if (!storeRepository.existsById(storeId))
-            throw new NotFoundException("Not Found store");
+            throw new NotFoundException("Not Found storeId");
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -106,7 +106,7 @@ public class MenuService {
                 () -> new NotFoundException("Not Found userId"));
 
         Menu menu = menuRepository.findById(menuId).orElseThrow(
-                () -> new NotFoundException("Not Found menu"));
+                () -> new NotFoundException("Not Found menuId"));
 
         menu.update(dto.getMenuName(),
                 dto.getPrice(),
@@ -117,18 +117,18 @@ public class MenuService {
     //메뉴 삭제(상태 변경만)
     @Transactional
     public void deleteMenu(Long userId, Long menuId) {
-        User user = userRepository.findById(userId).orElseThrow(
+        userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Not Found userId"));
 
         Menu menu = menuRepository.findById(menuId).orElseThrow(
-                () -> new NotFoundException("Not Found Menu"));
+                () -> new NotFoundException("Not Found MenuId"));
 
         //삭제할 메뉴의 가게와 로그인한 유저가 소유한 가게가 맞으면 삭제
         Store menuStore = menu.getStore();
         List<Store> stores = storeRepository.findByUserId(userId);
 
         for (Store userStore : stores) {
-            if (ObjectUtils.nullSafeEquals(userStore,menuStore))//  객체 비교에는 equals
+            if (ObjectUtils.nullSafeEquals(userStore, menuStore))//  객체 비교에는 equals
                 menu.setMenuState(MenuState.DELETE);
         }
     }

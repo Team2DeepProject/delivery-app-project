@@ -47,7 +47,7 @@ class BookmarkServiceTest {
         Store store = new Store(user, "일식가게", null, null, null);
         Bookmark bookmark = new Bookmark(user, store);
 
-        given(userService.getUserById(userId)).willReturn(user);
+        given(userService.findUserByIdOrElseThrow(userId)).willReturn(user);
         given(storeService.findStoreByIdOrElseThrow(storeId)).willReturn(store);
         given(bookmarkRepository.findByUserIdAndStoreId(userId, storeId)).willReturn(Optional.empty());
 
@@ -65,7 +65,7 @@ class BookmarkServiceTest {
         Long userId = 1L;
         Long storeId = 1L;
 
-        given(userService.getUserById(userId)).willThrow(new RuntimeException("사용자를 찾을수 없음"));
+        given(userService.findUserByIdOrElseThrow(userId)).willThrow(new RuntimeException("사용자를 찾을수 없음"));
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
