@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.domain.notice.entity;
+package com.example.deliveryappproject.domain.storenotice.entity;
 
 import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.store.entity.Store;
@@ -6,14 +6,12 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "notices")
 public class Notice extends Timestamped {
 

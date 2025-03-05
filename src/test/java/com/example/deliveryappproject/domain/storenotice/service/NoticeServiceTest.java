@@ -1,8 +1,8 @@
-package com.example.deliveryappproject.domain.notice.service;
+package com.example.deliveryappproject.domain.storenotice.service;
 
-import com.example.deliveryappproject.domain.notice.dto.response.NoticeResponseDto;
-import com.example.deliveryappproject.domain.notice.entity.Notice;
-import com.example.deliveryappproject.domain.notice.repository.NoticeRepository;
+import com.example.deliveryappproject.domain.storenotice.dto.response.NoticeResponseDto;
+import com.example.deliveryappproject.domain.storenotice.entity.Notice;
+import com.example.deliveryappproject.domain.storenotice.repository.NoticeRepository;
 import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.domain.store.repository.StoreRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 

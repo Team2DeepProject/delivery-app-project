@@ -6,6 +6,7 @@ import com.example.deliveryappproject.config.JwtUtil;
 import com.example.deliveryappproject.domain.auth.entity.RefreshToken;
 import com.example.deliveryappproject.domain.auth.repository.RefreshTokenRepository;
 import com.example.deliveryappproject.domain.user.entity.User;
+import com.example.deliveryappproject.domain.user.enums.UserRole;
 import com.example.deliveryappproject.domain.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

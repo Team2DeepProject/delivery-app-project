@@ -1,13 +1,13 @@
-package com.example.deliveryappproject.domain.notice.dto.response;
+package com.example.deliveryappproject.domain.storenotice.dto.request;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class NoticeResponseDto {
+public class NoticeRequestDto {
 
-    private final Long id;
     private final String title;
     private final String contents;
+
 }

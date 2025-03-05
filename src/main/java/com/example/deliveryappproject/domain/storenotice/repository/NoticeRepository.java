@@ -1,6 +1,6 @@
-package com.example.deliveryappproject.domain.notice.repository;
+package com.example.deliveryappproject.domain.storenotice.repository;
 
-import com.example.deliveryappproject.domain.notice.entity.Notice;
+import com.example.deliveryappproject.domain.storenotice.entity.Notice;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
