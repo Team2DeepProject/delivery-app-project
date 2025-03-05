@@ -1,4 +1,4 @@
-package com.example.deliveryappproject.domain.menu.dto;
+package com.example.deliveryappproject.domain.menu.dto.response;
 
 import lombok.Getter;
 

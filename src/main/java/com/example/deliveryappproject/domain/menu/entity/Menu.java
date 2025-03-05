@@ -15,7 +15,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name="menus")
+@Table(name = "menus")
 public class Menu  extends Timestamped {
 
     @Id

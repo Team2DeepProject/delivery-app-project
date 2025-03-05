@@ -6,7 +6,7 @@ import com.example.deliveryappproject.common.exception.ForbiddenException;
 import com.example.deliveryappproject.common.exception.NotFoundException;
 import com.example.deliveryappproject.domain.bookmark.service.BookmarkCountService;
 import com.example.deliveryappproject.domain.bookmark.service.BookmarkService;
-import com.example.deliveryappproject.domain.menu.dto.MenuResponse;
+import com.example.deliveryappproject.domain.menu.dto.response.MenuResponse;
 import com.example.deliveryappproject.domain.menu.service.MenuService;
 import com.example.deliveryappproject.domain.store.dto.request.StoreCreateRequest;
 import com.example.deliveryappproject.domain.store.dto.request.StoreUpdateRequest;
