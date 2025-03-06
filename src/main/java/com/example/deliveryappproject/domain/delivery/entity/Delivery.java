@@ -1,5 +1,6 @@
 package com.example.deliveryappproject.domain.delivery.entity;
 
+import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.order.entity.Order;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +20,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Delivery {
+public class Delivery extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
