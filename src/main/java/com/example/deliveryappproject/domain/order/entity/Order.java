@@ -1,5 +1,6 @@
 package com.example.deliveryappproject.domain.order.entity;
 
+import com.example.deliveryappproject.common.entity.Timestamped;
 import com.example.deliveryappproject.domain.delivery.entity.Delivery;
 import com.example.deliveryappproject.domain.store.entity.Store;
 import com.example.deliveryappproject.domain.user.entity.User;
@@ -29,7 +30,7 @@ import java.util.Objects;
 @Getter
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Order {
+public class Order extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

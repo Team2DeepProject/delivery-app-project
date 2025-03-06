@@ -25,7 +25,7 @@ import static com.example.deliveryappproject.domain.cart.util.RedisKeyUtil.getIt
 public class CartRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private static final long durationTime = 5L;
+    private static final long durationTime = 60 * 24;
 
 
     public void saveItems(Long userId, CartItemsRequest cartItemsRequest) {
