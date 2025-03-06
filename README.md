@@ -10,7 +10,7 @@
 * [📌 General Information](#general-information)
 * [🛠️ Technologies Used](#technologies-used)
 * [📂 API Documentation](#api-documentation)
-* [🏗️ Wireframe](#Wireframe)
+* [🏗️ Wireframe](#wireframe)
 * [📊 ERD](#erd)
 * [📬 Contact](#contact)
 <!-- * [License](#license) -->
@@ -252,7 +252,7 @@
 
 <br>
 
-### 즐겨찾(Bookmarks) /bookmarks
+### 즐겨찾기(Bookmarks) /bookmarks
 
 
 
